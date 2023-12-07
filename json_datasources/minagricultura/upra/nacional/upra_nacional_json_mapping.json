@@ -1,0 +1,192 @@
+{
+    "version": "1.0",
+    "description": "Mapping for geoJSON received from API of UPRA's Mapserver",
+    "field-mappings": [
+        {
+            "field-name": "Marca",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "function-call",
+                "rules": {
+                    "function-name": "get_marca()",
+                    "parameters": ["{$.*}"]
+                },
+                "default-value": null
+            }
+        },
+        {
+            "field-name": "Departamento",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "function-call",
+                "rules": {
+                    "function-name": "sanitize()",
+                    "parameters": ["python:upper({$.features.properties.departamen})"]
+                },
+                "default-value": "Sin Información"
+            }
+        },
+        {
+            "field-name": "Codigo_departamento",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.features.properties.cod_depart"            
+                },
+                "default-value": "00"
+            }
+        },
+        {
+            "field-name": "Municipio",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "function-call",
+                "rules": {
+                    "function-name": "sanitize()",
+                    "parameters": ["python:upper({$.features.properties.municipio})"]
+                },
+                "default-value": "Sin Información"
+            }
+        },
+        {
+            "field-name": "Codigo_municipio",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.features.properties.cod_dane_mpio"
+                },
+                "default-value": "00000"
+            }
+        },
+        {
+            "field-name": "Código_parametro",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "default-value": "1044"
+            }
+        },
+        {
+            "field-name": "Parametro",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "default-value": "aptitud_aguacate_hass"
+            }
+        },
+        {
+            "field-name": "Ano_parametro",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "csv-source",
+                "rules": {
+                    "source": "parametros_capas.csv",
+                    "find-values": ["{#Código_parametro#}"],
+                    "key-columns": ["Codigo_Parametro"],
+                    "value-column": "Ano_Parametro"
+                },
+                "default-value": "0000"
+            }
+        },
+        {
+            "field-name": "Mes_parametro",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "csv-source",
+                "rules": {
+                    "source": "parametros_capas.csv",
+                    "find-values": ["{#Código_parametro#}"],
+                    "key-columns": ["Codigo_Parametro"],
+                    "value-column": "Mes_Parametro"
+                },
+                "default-value": "0000"
+            }
+        },
+        {
+            "field-name": "Codigo_valor",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "csv-source",
+                "rules": {
+                    "source": "parametros_capas.csv",
+                    "find-values": ["{$.features.properties.aptitud}"],
+                    "key-columns": ["Descripcion_Rango_de_Valores"],
+                    "value-column": "Código_Rango_de_Valores"
+                },
+                "default-value": "000000"
+            }
+        },
+        {
+            "field-name": "Valor",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.features.properties.aptitud"
+                },
+                "default-value": "Sin Información"
+            }
+        },
+        {
+            "field-name": "Poligono",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "json-mapping",
+                "rules": {
+                    "json": {
+                        "type": "{$.features.geometry.type}",
+                        "coordinates": "{$.features.geometry.coordinates}"
+                    }
+                },
+                "default-value": null
+            }
+        },
+        {
+            "field-name": "NumId",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.features.id"
+                },
+                "default-value": "0"
+            }
+        },
+        {
+            "field-name": "Area",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.features.properties.st_area(shape)"
+                },
+                "default-value": "0"
+            }
+        },
+        {
+            "field-name": "Fecha_extraccion",
+            "description": "",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "default-value": "python:datetime.datetime.now().strftime('%Y-%m-%d')"
+            }
+        }
+    ]
+}

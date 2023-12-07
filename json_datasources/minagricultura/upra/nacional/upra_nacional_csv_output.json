@@ -1,0 +1,29 @@
+{
+        "version": "1.0",
+        "description": "CSV definition for Upra Nacional layers. The field-mappings element is used to map the fields from the mapping definition to the destination. The order of the fields in the field-mappings element is the order of the fields in the destination file. Each string in the array is the name of the field in mapping definition. The field-mappings element is optional. If it is not present, the fields in the destination file will be the same as the fields in the mapping file.",
+        "output-file": {
+            "type": "csv",
+            "output-folder": "./output",
+            "output-file-pattern": "upra_nacional.csv",
+            "separator": "|",
+            "encoding": "utf-8",
+            "header": true,
+            "field-mapping": [
+                "Marca",
+                "Departamento",
+                "Codigo_departamento",
+                "Municipio",
+                "Codigo_municipio",
+                "Código_parametro",
+                "Parametro",
+                "Ano_parametro",
+                "Mes_parametro",
+                "Codigo_valor",
+                "Valor",
+                "Poligono",
+                "NumId",
+                "Area",
+                "Fecha_extraccion"
+            ]
+        }
+}

@@ -1,97 +1,111 @@
 {
     "version": "1.0",
+    "description": "Mapping for the dataset 'Estados Financieros de las Entidades del Sector Central del Estado Colombiano'",
     "field_mappings": [
         {
-            "field_name": "TIPO_IDENTIFICACION",
+            "field-name": "TIPO_IDENTIFICACION",
             "description": "Identification type. For this dataset, it is always '2' (NIT)",
-            "output_order": 10,
             "optional": false,
-            "transformation": {
-                "type": "regex",
-                "rules": {
-                    "pattern": null,
-                    "replacement": "2"
-                }
+            "mapping": {
+                "type": "simple",
+                "default-value": "2"
             }
         },
         {
-            "field_name": "_TIPO_ENTIDAD",
-            "description": "Internal use only. Entity type. It is used to build the URL to get the identification number",
-            "source_field": "$.tipo_entidad",
-            "output_order": -1,
-            "optional": true
+            "field-name": "_TIPO_ENTIDAD",
+            "description": "Internal use only. Entity type. It is used to build the URL to get the identification number.",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.tipo_entidad"
+                },
+                "default-value": null
+            }
         },
         {
-            "field_name": "IDENTIFICACION",
+            "field-name": "IDENTIFICACION",
             "description": "Identification number. It is obtained from the datos.gov.co dataset in JSON. The URL to load the data is built with the entity type (_TIPO_ENTIDAD) and this entity code",
-            "source_field": "$.codigo_entidad",
-            "output_order": 20,
             "optional": false,
-            "transformations": [
-                {
-                    "type": "get-json-element",
-                    "rules": {
-                        "url": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad=#IDENTIFICACION#&tipo_entidad=#_TIPO_ENTIDAD#",
-                        "retrieve_element": "0.numeroidentificacion"
-                    }
-                }
-            ]
-        },
-        {
-            "field_name": "RAZON",
-            "description": "Legal Name of the entity",
-            "output_order": 1,
-            "source_field": "$.nombre_entidad",
-            "optional": false
-        },
-        {
-            "field_name": "CODIGO_CUENTA",
-            "description": "Account code",
-            "output_order": 30,
-            "source_field": "$.nombre_cuenta",
-            "optional": false
-        },
-        {
-            "field_name": "DESCRIPCION_CUENTA",
-            "description": "Account description",
-            "output_order": 40,
-            "source_field": "$.cuenta",
-            "optional": false           
-        },
-        {
-            "field_name": "VALOR",
-            "description": "Total Amount for the account in COP",
-            "output_order": 50,
-            "source_field": "$.valor",
-            "optional": false
-        },
-        {
-            "field_name": "NIIF",
-            "description": "International Financial Reporting Standards flag. It is always 'TRUE' for this dataset",
-            "output_order": 60,
-            "optional": false,
-            "transformation": {
-                "type": "regex",
+            "mapping": {
+                "type": "json-source",
                 "rules": {
-                    "pattern": null,
-                    "replacement": "TRUE"
-                }
+                    "source": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad={$.codigo_entidad}&tipo_entidad={_TIPO_ENTIDAD}",
+                    "element-to-extract": "0.numeroidentificacion"
+                },
+                "default-value": null
             }
         },
         {
-            "field_name": "FECHA_FINANZAS",
-            "description": "Cut-off date of the dataset. It is obtained from the dataset in JSON and transformed to the format 'MM/DD/YYYY'.",
-            "output_order": 70,
-            "source_field": "input",
+            "field-name": "RAZON",
+            "description": "Legal Name of the entity",
             "optional": false,
-            "transformation": {
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.nombre_entidad" 
+                },
+                "default-value": null
+            }
+        },
+        {
+            "field-name": "CODIGO_CUENTA",
+            "description": "Account code",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.nombre_cuenta" 
+                },
+                "default-value": null
+            }
+        },
+        {
+            "field-name": "DESCRIPCION_CUENTA",
+            "description": "Account description",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.cuenta" 
+                },
+                "default-value": null
+            }
+        },
+        {
+            "field-name": "VALOR",
+            "description": "Total Amount for the account in COP",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "rules": {
+                    "element": "$.valor" 
+                },
+                "default-value": null
+            }
+        },
+        {
+            "field-name": "NIIF",
+            "description": "International Financial Reporting Standards flag. It is always 'TRUE' for this dataset",
+            "optional": false,
+            "mapping": {
+                "type": "simple",
+                "default-value": "TRUE"
+            }
+        },
+        {
+            "field-name": "FECHA_FINANZAS",
+            "description": "Cut-off date of the dataset. It is obtained from the dataset in JSON and transformed to the format 'MM/DD/YYYY'.",
+            "optional": false,
+            "mapping": {
                 "type": "regex",
                 "rules": {
+                    "element": "$.fecha_corte",
                     "pattern": "(\\d{4})-(\\d{2})-(\\d{2})T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}",
                     "replacement": "{2}/{3}/{1}"
-                }
+                },
+                "default-value": null
             }
         }
-    ],
-    "separator": "~{<"
+    ]
 }
