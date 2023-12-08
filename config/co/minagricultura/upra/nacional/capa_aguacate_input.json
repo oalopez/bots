@@ -31,7 +31,7 @@
                         "param-name": "resultOffset",
                         "start-offset": 0,
                         "increment": 1000,
-                        "pagination-sequence": "python({$.exceededTransferLimit}==true)"
+                        "pagination-sequence": "@python({$.exceededTransferLimit}==true)"
                     }
                 }
             }

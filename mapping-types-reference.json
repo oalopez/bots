@@ -27,7 +27,7 @@
             "optional": false,
             "mapping": {
                 "type": "simple",
-                "default-value": "python(datetime.datetime.now().strftime('%Y-%m-%d'))"
+                "default-value": "@python(datetime.datetime.now().strftime('%Y-%m-%d'))"
             }
         },
         {

@@ -1,0 +1,28 @@
+[
+    {
+        "tipo_entidad": "33",
+        "nombre_tipo_entidad": "SISTEMAS DE PAGO DE BAJO VALOR",
+        "codigo_entidad": "6",
+        "nombre_entidad": "VISIONAMOS",
+        "fecha_corte": "2022-12-31T00:00:00.000",
+        "cuenta": "320000",
+        "nombre_cuenta": "RESERVAS",
+        "moneda": "0",
+        "nombre_moneda": "Total",
+        "signo_valor": "+",
+        "valor": "1463439401.94"
+    },
+    {
+        "tipo_entidad": "1",
+        "nombre_tipo_entidad": "ESTABLECIMIENTOS BANCARIOS",
+        "codigo_entidad": "54",
+        "nombre_entidad": "BANCOOMEVA",
+        "fecha_corte": "2022-12-31T00:00:00.000",
+        "cuenta": "273500",
+        "nombre_cuenta": "BONIFICACIONES",
+        "moneda": "0",
+        "nombre_moneda": "Total",
+        "signo_valor": "+",
+        "valor": "1091460308"
+    }
+]

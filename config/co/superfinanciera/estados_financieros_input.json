@@ -9,7 +9,7 @@
             "delay": 0,
             "timeout": 30000,
             "params": {
-                "$where": "fecha_corte between {#year#}-12-31T00:00:00 and {#year#}-12-31T23:59:59",
+                "$where": "fecha_corte between @global(_year)-12-31T00:00:00 and @global(_year)-12-31T23:59:59",
                 "moneda": "0"
             }
         }

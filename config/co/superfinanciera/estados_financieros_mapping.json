@@ -1,6 +1,6 @@
 {
     "version": "1.0",
-    "description": "Mapping for the dataset 'Estados Financieros de las Entidades del Sector Central del Estado Colombiano'",
+    "description": "Mapping for dataset Estados Financieros of institutions supervised by 'Superintendencia Financiera' of Colombia",
     "field_mappings": [
         {
             "field-name": "TIPO_IDENTIFICACION",
@@ -18,7 +18,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.tipo_entidad"
+                    "element": "@jsonpath($.[@this].tipo_entidad)"
                 },
                 "default-value": null
             }
@@ -30,8 +30,8 @@
             "mapping": {
                 "type": "json-source",
                 "rules": {
-                    "source": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad={$.codigo_entidad}&tipo_entidad={_TIPO_ENTIDAD}",
-                    "element-to-extract": "0.numeroidentificacion"
+                    "source": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad=@jsonpath($.[@this].codigo_entidad)&tipo_entidad=@local(_TIPO_ENTIDAD)",
+                    "element-to-extract": "@jsonpath($.[0].numeroidentificacion)"
                 },
                 "default-value": null
             }
@@ -43,7 +43,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.nombre_entidad" 
+                    "element": "@jsonpath($.[@this].nombre_entidad)" 
                 },
                 "default-value": null
             }
@@ -55,7 +55,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.nombre_cuenta" 
+                    "element": "@jsonpath($.[@this].nombre_cuenta)" 
                 },
                 "default-value": null
             }
@@ -67,7 +67,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.cuenta" 
+                    "element": "@jsonpath($.[@this].cuenta)" 
                 },
                 "default-value": null
             }
@@ -79,7 +79,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.valor" 
+                    "element": "@jsonpath($.[@this].valor)" 
                 },
                 "default-value": null
             }
@@ -100,7 +100,7 @@
             "mapping": {
                 "type": "regex",
                 "rules": {
-                    "element": "$.fecha_corte",
+                    "element": "@jsonpath($.[@this].fecha_corte)",
                     "pattern": "(\\d{4})-(\\d{2})-(\\d{2})T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}",
                     "replacement": "{2}/{3}/{1}"
                 },

@@ -10,7 +10,7 @@
                 "type": "function-call",
                 "rules": {
                     "function-name": "get_marca()",
-                    "parameters": ["{$.*}"]
+                    "parameters": ["@jsonpath($.features[@this].id)", "@jsonpath($.features[@this].properties)"]
                 },
                 "default-value": null
             }
@@ -23,7 +23,7 @@
                 "type": "function-call",
                 "rules": {
                     "function-name": "sanitize()",
-                    "parameters": ["python:upper({$.features.properties.departamen})"]
+                    "parameters": ["@python(upper(@jsonpath($.features[@this].properties.departamen)))"]
                 },
                 "default-value": "Sin Información"
             }
@@ -35,7 +35,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.features.properties.cod_depart"            
+                    "element": "@jsonpath($.features[@this].properties.cod_depart"  
                 },
                 "default-value": "00"
             }
@@ -48,7 +48,7 @@
                 "type": "function-call",
                 "rules": {
                     "function-name": "sanitize()",
-                    "parameters": ["python:upper({$.features.properties.municipio})"]
+                    "parameters": ["@python(upper(@jsonpath($.features[@this].properties.municipio)))"]
                 },
                 "default-value": "Sin Información"
             }
@@ -60,7 +60,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.features.properties.cod_dane_mpio"
+                    "element": "@jsonpath($.features[@this].properties.cod_dane_mpio)"
                 },
                 "default-value": "00000"
             }
@@ -91,7 +91,7 @@
                 "type": "csv-source",
                 "rules": {
                     "source": "parametros_capas.csv",
-                    "find-values": ["{#Código_parametro#}"],
+                    "find-values": ["@local(Código_parametro)"],
                     "key-columns": ["Codigo_Parametro"],
                     "value-column": "Ano_Parametro"
                 },
@@ -106,7 +106,7 @@
                 "type": "csv-source",
                 "rules": {
                     "source": "parametros_capas.csv",
-                    "find-values": ["{#Código_parametro#}"],
+                    "find-values": ["@local(Código_parametro)"],
                     "key-columns": ["Codigo_Parametro"],
                     "value-column": "Mes_Parametro"
                 },
@@ -121,7 +121,7 @@
                 "type": "csv-source",
                 "rules": {
                     "source": "parametros_capas.csv",
-                    "find-values": ["{$.features.properties.aptitud}"],
+                    "find-values": ["@jsonpath($.features[@this].properties.aptitud)"],
                     "key-columns": ["Descripcion_Rango_de_Valores"],
                     "value-column": "Código_Rango_de_Valores"
                 },
@@ -135,7 +135,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.features.properties.aptitud"
+                    "element": "@jsonpath($.features[@this].properties.aptitud)"
                 },
                 "default-value": "Sin Información"
             }
@@ -148,8 +148,8 @@
                 "type": "json-mapping",
                 "rules": {
                     "json": {
-                        "type": "{$.features.geometry.type}",
-                        "coordinates": "{$.features.geometry.coordinates}"
+                        "type": "@jsonpath($.features[@this].geometry.type)",
+                        "coordinates": "@jsonpath($.features[@this].geometry.coordinates)"
                     }
                 },
                 "default-value": null
@@ -162,7 +162,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.features.id"
+                    "element": "@jsonpath($.features[@this].id)"
                 },
                 "default-value": "0"
             }
@@ -174,7 +174,7 @@
             "mapping": {
                 "type": "simple",
                 "rules": {
-                    "element": "$.features.properties.st_area(shape)"
+                    "element": "@jsonpath($.features[@this].properties.st_area(shape))"
                 },
                 "default-value": "0"
             }
@@ -185,7 +185,7 @@
             "optional": false,
             "mapping": {
                 "type": "simple",
-                "default-value": "python:datetime.datetime.now().strftime('%Y-%m-%d')"
+                "default-value": "@python(datetime.datetime.now().strftime('%Y-%m-%d'))"
             }
         }
     ]
