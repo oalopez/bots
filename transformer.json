@@ -1,25 +1,25 @@
 {
     "version": "1.0",
     "description": "Mapping for dataset Estados Financieros of institutions supervised by 'Superintendencia Financiera' of Colombia",
-    "field_mappings": [
+    "elements-iterator-jsonpath": "$.[0:][0:]",
+    "field-mappings": [
         {
             "field-name": "TIPO_IDENTIFICACION",
             "description": "Identification type. For this dataset, it is always '2' (NIT)",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "default-value": "2"
+                "value": "2",
+                "default-value": null
             }
         },
         {
             "field-name": "_TIPO_ENTIDAD",
             "description": "Internal use only. Entity type. It is used to build the URL to get the identification number.",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "rules": {
-                    "element": "@jsonpath($.[@this].tipo_entidad)"
-                },
+                "value": "@jsonpath($.[0].[0].tipo_entidad)",
                 "default-value": null
             }
         },
@@ -27,11 +27,11 @@
             "field-name": "IDENTIFICACION",
             "description": "Identification number. It is obtained from the datos.gov.co dataset in JSON. The URL to load the data is built with the entity type (_TIPO_ENTIDAD) and this entity code",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "json-source",
-                "rules": {
-                    "source": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad=@jsonpath($.[@this].codigo_entidad)&tipo_entidad=@local(_TIPO_ENTIDAD)",
-                    "element-to-extract": "@jsonpath($.[0].numeroidentificacion)"
+                "value": {
+                    "source": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad=@jsonpath($.[0].[0].codigo_entidad)&tipo_entidad=@local(_TIPO_ENTIDAD)",
+                    "element-to-extract": "$.[0].numeroidentificacion"
                 },
                 "default-value": null
             }
@@ -40,11 +40,9 @@
             "field-name": "RAZON",
             "description": "Legal Name of the entity",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "rules": {
-                    "element": "@jsonpath($.[@this].nombre_entidad)" 
-                },
+                "value": "@jsonpath($.[0].[0].nombre_entidad)",
                 "default-value": null
             }
         },
@@ -52,11 +50,9 @@
             "field-name": "CODIGO_CUENTA",
             "description": "Account code",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "rules": {
-                    "element": "@jsonpath($.[@this].nombre_cuenta)" 
-                },
+                "value": "@jsonpath($.[0].[0].nombre_cuenta)",
                 "default-value": null
             }
         },
@@ -64,11 +60,9 @@
             "field-name": "DESCRIPCION_CUENTA",
             "description": "Account description",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "rules": {
-                    "element": "@jsonpath($.[@this].cuenta)" 
-                },
+                "value": "@jsonpath($.[0].[0].cuenta)",
                 "default-value": null
             }
         },
@@ -76,11 +70,9 @@
             "field-name": "VALOR",
             "description": "Total Amount for the account in COP",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "rules": {
-                    "element": "@jsonpath($.[@this].valor)" 
-                },
+                "value": "@jsonpath($.[0].[0].valor)",
                 "default-value": null
             }
         },
@@ -88,19 +80,20 @@
             "field-name": "NIIF",
             "description": "International Financial Reporting Standards flag. It is always 'TRUE' for this dataset",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "simple",
-                "default-value": "TRUE"
+                "value": "TRUE",
+                "default-value": null
             }
         },
         {
             "field-name": "FECHA_FINANZAS",
             "description": "Cut-off date of the dataset. It is obtained from the dataset in JSON and transformed to the format 'MM/DD/YYYY'.",
             "optional": false,
-            "mapping": {
+            "transformation": {
                 "type": "regex",
-                "rules": {
-                    "element": "@jsonpath($.[@this].fecha_corte)",
+                "value": {
+                    "element": "@jsonpath($.[0].[0].fecha_corte)",
                     "pattern": "(\\d{4})-(\\d{2})-(\\d{2})T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}",
                     "replacement": "{2}/{3}/{1}"
                 },

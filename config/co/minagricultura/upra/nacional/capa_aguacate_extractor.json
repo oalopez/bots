@@ -1,8 +1,8 @@
 {
         "version": "1.0",
         "description": "Crawling configuration for Mapserver of UPRA-Nacional",
-        "crawl": {
-            "type": "http-all-records",
+        "extraction": {
+            "type": "json-all-records",
             "rules": {
                 "url": "https://geoservicios.upra.gov.co/arcgis/rest/services/aptitud_uso_suelo/aptitud_aguacate_hass_agosto_2018/MapServer/0/query",
                 "method": "GET",
