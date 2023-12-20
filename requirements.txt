@@ -1,3 +1,5 @@
 jsonpath-ng
 requests
 pandas
+colorlog
+shapely

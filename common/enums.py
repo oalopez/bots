@@ -7,6 +7,7 @@ class TransformationType(Enum):
     SIMPLE = "simple"
     REGEX = "regex"
     JSON_SOURCE = "json-source"
+    CACHE="cache"
 
 class LoaderType(Enum):
     pass

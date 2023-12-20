@@ -1,14 +1,86 @@
 [
     {
-        "tipo_entidad": "1",
-        "cod_entidad": "43",
-        "razon_social": "BANCO AGRARIO DE COLOMBIA S.A. y podr\ufffd usar el nombre BANAGRARIO.",
-        "direccion": "Carrera 8 No. 15-43",
+        "tipo_entidad": "118",
+        "cod_entidad": "9",
+        "razon_social": "MASTERCARD COLOMBIA ADMINISTRADORA S.A.",
+        "direccion": "Carrera 11 No. 84 A- 09 Entrada Norte, Piso 8 Of. 801",
         "ciudad": "BOGOT\ufffd D.C.",
-        "numeroidentificacion": "8000378008",
+        "numeroidentificacion": "9010104580",
+        "nombrepublicocargo": "Pesidente",
+        "representante_legal": "MARCELA DE LAS MERCEDES CARRASCO HEILBRON",
+        "emailprincipal": "notificaciones_mcca@mastercard.com",
+        "uripaginaweb": "Pendiente"
+    },
+    {
+        "tipo_entidad": "14",
+        "cod_entidad": "9",
+        "razon_social": "SKANDIA COMPA\ufffd\ufffdA DE  SEGUROS DE VIDA S.A., pudiendo en el desarrollo de su objeto social utilizar la sigla SKANDIA SEGUROS DE VIDA S.A.",
+        "direccion": "Avenida 19 No.109a -30",
+        "ciudad": "BOGOT\ufffd D.C.",
+        "numeroidentificacion": "8600025041",
         "nombrepublicocargo": "Presidente",
-        "representante_legal": "HERNANDO FRANCISCO CHICA ZUCCARDI",
-        "emailprincipal": "attnclie@bancoagrario.gov.co",
-        "uripaginaweb": "www.bancoagrario.gov.co"
+        "representante_legal": "SANTIAGO GARC\ufffdA MART\ufffdNEZ",
+        "emailprincipal": "notificacionestramites@skandia.co",
+        "uripaginaweb": "www.skandia.com.co"
+    },
+    {
+        "tipo_entidad": "22",
+        "cod_entidad": "9",
+        "razon_social": "FONDO DE GARANTIAS DE ENTIDADES COOPERATIVAS FOGACOOP",
+        "direccion": "Carrera 13 No. 32-51 int11/Cra 13A No. 32-30 local 23 Parque Residencial Baviera",
+        "ciudad": "BOGOT\ufffd D.C.",
+        "numeroidentificacion": "8300533192",
+        "nombrepublicocargo": "Director",
+        "representante_legal": "MAR\ufffdA ELENA GRUESO RODR\ufffdGUEZ",
+        "emailprincipal": "fogacoop@fogacoop.gov.co",
+        "uripaginaweb": "www.fogacoop.gov.co"
+    },
+    {
+        "tipo_entidad": "85",
+        "cod_entidad": "9",
+        "razon_social": "Progresi\ufffdn Sociedad Comisionista de Bolsa  S.A. Podr\ufffd utilizar la sigla Progresi\ufffdn SCB",
+        "direccion": "Calle 77 No. 7-44 Oficina 302 B",
+        "ciudad": "MEDELLIN",
+        "numeroidentificacion": "8909316099",
+        "nombrepublicocargo": "Presidente",
+        "representante_legal": "ALEXANDER GONZ\ufffdLEZ PE\ufffdA",
+        "emailprincipal": "mpramirez@ad-cap.com.co",
+        "uripaginaweb": "www.ad-cap.com.co"
+    },
+    {
+        "tipo_entidad": "23",
+        "cod_entidad": "9",
+        "razon_social": "SKANDIA ADMINISTRADORA DE FONDOS DE PENSIONES Y CESANT\ufffdAS S.A., pudiendo en el desarrollo de su objeto social utilizar la sigla  SKANDIA PENSIONES Y CESANT\ufffdAS S.A.",
+        "direccion": "Avenida 19 No.109a -30",
+        "ciudad": "BOGOT\ufffd D.C.",
+        "numeroidentificacion": "8001485142",
+        "nombrepublicocargo": "Presidente",
+        "representante_legal": "SANTIAGO GARC\ufffdA MART\ufffdNEZ",
+        "emailprincipal": "notificacionestramites@skandia.com.co",
+        "uripaginaweb": "Pendiente"
+    },
+    {
+        "tipo_entidad": "13",
+        "cod_entidad": "9",
+        "razon_social": "ZURICH COLOMBIA SEGUROS S.A.",
+        "direccion": "Calle 116 No.7 - 15 Of 1201 Ed. Cusezar",
+        "ciudad": "BOGOT\ufffd D.C.",
+        "numeroidentificacion": "8600025340",
+        "nombrepublicocargo": "Presidente",
+        "representante_legal": "JUAN CARLOS REALPHE GUEVARA",
+        "emailprincipal": "notificaciones.co@zurich.com",
+        "uripaginaweb": "www.qbe.com.co"
+    },
+    {
+        "tipo_entidad": "1",
+        "cod_entidad": "9",
+        "razon_social": "CITIBANK-COLOMBIA Podr\ufffd utilizar solamente la expresi\ufffdn CITIBANK",
+        "direccion": "Carrera 9 A No. 99-02 Piso 3",
+        "ciudad": "BOGOT\ufffd D.C.",
+        "numeroidentificacion": "8600511354",
+        "nombrepublicocargo": "Presidente",
+        "representante_legal": "Elizabeth Rey D\ufffdaz",
+        "emailprincipal": "legalnotificaciones@citi.com",
+        "uripaginaweb": "Pendiente"
     }
 ]

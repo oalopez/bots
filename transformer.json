@@ -19,7 +19,7 @@
             "optional": false,
             "transformation": {
                 "type": "simple",
-                "value": "@jsonpath($.[0].[0].tipo_entidad)",
+                "value": "@jsonpath($.tipo_entidad)",
                 "default-value": null
             }
         },
@@ -28,12 +28,19 @@
             "description": "Identification number. It is obtained from the datos.gov.co dataset in JSON. The URL to load the data is built with the entity type (_TIPO_ENTIDAD) and this entity code",
             "optional": false,
             "transformation": {
-                "type": "json-source",
+                "type": "cache",
                 "value": {
-                    "source": "https://www.datos.gov.co/resource/sr9n-792w.json?$where=cod_entidad=@jsonpath($.[0].[0].codigo_entidad)&tipo_entidad=@local(_TIPO_ENTIDAD)",
-                    "element-to-extract": "$.[0].numeroidentificacion"
+                    "value-to-find": ["@jsonpath($.codigo_entidad)", "@local(_TIPO_ENTIDAD)"],
+                    "cache-definition": {
+                        "source": "cache/sr9n-792w.json",
+                        "source-type": "json",
+                        "strategy": "full",
+                        "keys": ["$.cod_entidad", "$.tipo_entidad"],
+                        "value": "$.numeroidentificacion"
+                    }
                 },
-                "default-value": null
+                "default-value": null,
+                "exception-strategy": "ignore"
             }
         },
         {
@@ -42,7 +49,7 @@
             "optional": false,
             "transformation": {
                 "type": "simple",
-                "value": "@jsonpath($.[0].[0].nombre_entidad)",
+                "value": "@jsonpath($.nombre_entidad)",
                 "default-value": null
             }
         },
@@ -52,7 +59,7 @@
             "optional": false,
             "transformation": {
                 "type": "simple",
-                "value": "@jsonpath($.[0].[0].nombre_cuenta)",
+                "value": "@jsonpath($.nombre_cuenta)",
                 "default-value": null
             }
         },
@@ -62,7 +69,7 @@
             "optional": false,
             "transformation": {
                 "type": "simple",
-                "value": "@jsonpath($.[0].[0].cuenta)",
+                "value": "@jsonpath($.cuenta)",
                 "default-value": null
             }
         },
@@ -72,7 +79,7 @@
             "optional": false,
             "transformation": {
                 "type": "simple",
-                "value": "@jsonpath($.[0].[0].valor)",
+                "value": "@jsonpath($.valor)",
                 "default-value": null
             }
         },
@@ -93,9 +100,9 @@
             "transformation": {
                 "type": "regex",
                 "value": {
-                    "element": "@jsonpath($.[0].[0].fecha_corte)",
+                    "element": "@jsonpath($.fecha_corte)",
                     "pattern": "(\\d{4})-(\\d{2})-(\\d{2})T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}",
-                    "replacement": "{2}/{3}/{1}"
+                    "replacement": "\\2/\\3/\\1"
                 },
                 "default-value": null
             }

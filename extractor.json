@@ -10,8 +10,23 @@
             "timeout": 30000,
             "params": {
                 "$where": "fecha_corte between '@global(_year)-12-31T00:00:00' and '@global(_year)-12-31T23:59:59'",
-                "moneda": "0"
+                "moneda": "0",
+                "$limit": "100000",
+                "$$app_token": "7E7yadEKYf3pNpIaasEFu9OG6"
+            },
+            "pagination": {
+                "type": "parameterized",
+                "next": {
+                    "start-param": "$offset",
+                    "step-param": "$limit",
+                    "start": 0,
+                    "step": 2000
+                },
+                "stop": {
+                    "type": "no-results"
+                }
             }
+
         }
     }
 }

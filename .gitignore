@@ -1,3 +1,6 @@
 /workspace.code-workspacex
 /.venv
 **/__pycache__/*
+transformed_df.csv
+logs/app.log
+logs/error.log

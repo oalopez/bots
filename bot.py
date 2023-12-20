@@ -1,19 +1,25 @@
+# main.py
+
 import json
 import os
+import pandas as pd
 
 from extractor.extractor import extract
 from transformer.transformer import transform
 from loader.loader import load
-import pandas as pd
 
+from common.utils.logging_config import setup_logger
+
+setup_logger()
+
+# TODO: Handle context_vars correctly
 global_vars={"_year":"2022"}
 local_vars = {}
 
 context_vars = {"global_vars": global_vars, 
                 "local_vars": local_vars}
 
-
-def main():
+def process():
     # 1. Extraction process
     if not os.path.isfile(os.path.join(os.path.dirname(__file__), 'extractor.json')):
         raise Exception('Extractor file does not exist')
@@ -32,6 +38,9 @@ def main():
     #print head of transformed_df
     print(transformed_df.head())
 
+    #dump transformed_df to csv
+    transformed_df.to_csv("transformed_df.csv")
+
     
     # 3. Load process
     # if not os.path.isfile(os.path.join(os.path.dirname(__file__), 'loader.json')):
@@ -47,4 +56,4 @@ def main():
     #     print("ERROR")
 
 if __name__ == "__main__":
-    main()
+    process()
