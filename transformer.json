@@ -25,18 +25,19 @@
         },
         {
             "field-name": "IDENTIFICACION",
-            "description": "Identification number. It is obtained from the datos.gov.co dataset in JSON. The URL to load the data is built with the entity type (_TIPO_ENTIDAD) and this entity code",
+            "description": "Identification number with Verification Digit. It is obtained from the datos.gov.co dataset in JSON. The URL to load the data is built with the entity type (_TIPO_ENTIDAD) and this entity code",
             "optional": false,
             "transformation": {
                 "type": "cache",
                 "value": {
                     "value-to-find": ["@jsonpath($.codigo_entidad)", "@local(_TIPO_ENTIDAD)"],
                     "cache-definition": {
+                        "namespace": "cache_ns",
                         "source": "cache/sr9n-792w.json",
                         "source-type": "json",
                         "strategy": "full",
-                        "keys": ["$.cod_entidad", "$.tipo_entidad"],
-                        "value": "$.numeroidentificacion"
+                        "keys": ["@cache_ns.jsonpath($.cod_entidad)", "@cache_ns.jsonpath($.tipo_entidad)"],
+                        "value": "@cache_ns.python(custom_function.slice_string(@cache_ns.jsonpath($.numeroidentificacion), 0, 9))"
                     }
                 },
                 "default-value": null,

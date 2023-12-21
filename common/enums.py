@@ -11,3 +11,13 @@ class TransformationType(Enum):
 
 class LoaderType(Enum):
     pass
+
+class PaginationType(Enum):
+    PARAMS = "params"
+
+class TotalRecordsType(Enum):
+    JSON = "json"
+
+class StopSequenceType(Enum):
+    PAGE_LIMIT = "page-limit"
+    NO_MORE_RECORDS = "no-more-records"

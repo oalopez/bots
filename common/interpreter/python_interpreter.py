@@ -1,7 +1,8 @@
 import re
 import importlib
+import inspect
 
-def pre_process(function_call_string):
+def interpret(function_call_string):
     # Regex to match 'module.function_name(arguments)'
     match = re.match(r"(\w+)\.(\w+)\((.*)\)", function_call_string)
 
@@ -20,7 +21,7 @@ def call_function(module_name, function_name, arguments):
         # Dynamically import the module
         module = importlib.import_module(module_name)
     except ImportError as e:
-        return f"Error importing module: {str(e)}"
+        raise Exception(f"Error importing module: {str(e)}")
 
     # Get the function from the provided module or class
     func = getattr(module, function_name, None)
@@ -43,5 +44,5 @@ def call_function(module_name, function_name, arguments):
     return result
 
 # Example usage
-# call_function("string", "upper", ["lowercase_text"])
-# call_function("datetime", "datetime", ["2020-01-01"])
+# pre_process("math.sqrt(16)")
+# pre_process("os.path.basename('/path/to/file.txt')")

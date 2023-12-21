@@ -1,4 +1,4 @@
-def pre_process(global_var, context_vars):
+def interpret(global_var, context_vars):
     '''
     Finds the variable named 'global_var' and returns its value
     '''

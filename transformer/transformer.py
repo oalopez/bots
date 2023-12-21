@@ -4,7 +4,7 @@ from transformer.type.regex import regex
 from transformer.type.json_source import json_source
 from transformer.type.cache import cache
 from common.enums import TransformationType
-from common.preprocessor.preprocessor import parse_element
+from common.interpreter.interpreter import parse_element
 from common.utils.exceptions import RequiredFieldException, InvalidTypeException, handle_transformation_exception
 import pandas as pd
 
@@ -30,13 +30,13 @@ def transform(transformer_json, extracted_json_output, context_vars):
         for field_mapping in transformer_json['field-mappings']: 
             field_name = field_mapping['field-name']
             optional = field_mapping['optional']
-            transformation_element_parsed = parse_element(field_mapping['transformation'], element.value, context_vars)
+            transformation_element_parsed = parse_element(field_mapping['transformation'], element.value, context_vars, namespace='')
             calculated_value = None
             try:            
-                strategy = None if 'exception-strategy' not in transformation_element_parsed else transformation_element_parsed['exception-strategy']
+                exception_strategy = None if 'exception-strategy' not in transformation_element_parsed else transformation_element_parsed['exception-strategy']
                 calculated_value = calculate_transformation(field_name, transformation_element_parsed, optional)
             except RequiredFieldException as rfe:
-                handle_transformation_exception(rfe, strategy)
+                handle_transformation_exception(rfe, exception_strategy)
 
             # Add calculated value to dataframe. The data frame should have an index with the element id
             df.loc[index, field_name] = calculated_value

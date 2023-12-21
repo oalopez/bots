@@ -4,29 +4,40 @@
     "extraction": {
         "type": "json-all-records",
         "rules": {
-            "url": "https://www.datos.gov.co/resource/mxk5-ce6w.json",
+            "source": "https://www.datos.gov.co/resource/mxk5-ce6w.json",
             "method": "GET",
-            "delay": 0,
-            "timeout": 30000,
+            "success-code": "200",
             "params": {
                 "$where": "fecha_corte between '@global(_year)-12-31T00:00:00' and '@global(_year)-12-31T23:59:59'",
                 "moneda": "0",
-                "$limit": "100000",
                 "$$app_token": "7E7yadEKYf3pNpIaasEFu9OG6"
             },
             "pagination": {
-                "type": "parameterized",
+                "type": "params",
                 "next": {
-                    "start-param": "$offset",
-                    "step-param": "$limit",
-                    "start": 0,
-                    "step": 2000
+                    "offset-param-name": "$offset",
+                    "offset-start-value": "0",
+                    "step-param-name": "$limit",
+                    "step-value": "10"
                 },
-                "stop": {
-                    "type": "no-results"
+                "stop-sequence": {
+                    "type": "page-limit",
+                    "limit": "5"
+                }
+            },
+            "total-records": {
+                "type": "json",
+                "value":{
+                    "source": "https://www.datos.gov.co/resource/mxk5-ce6w.json",
+                    "params": {
+                        "$select": "count(*)",
+                        "$where": "fecha_corte between '@global(_year)-12-31T00:00:00' and '@global(_year)-12-31T23:59:59'",
+                        "moneda": "0",
+                        "$$app_token": "7E7yadEKYf3pNpIaasEFu9OG6"
+                    },
+                    "element-jsonpath": "$.0.count"
                 }
             }
-
         }
     }
 }

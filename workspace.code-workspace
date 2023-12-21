@@ -8,7 +8,7 @@
 		"version": "0.2.0",
 		"configurations": [
 			{
-                "name": "Python: Run bot.py",
+                "name": "Python: Debug bot.py",
                 "type": "python",
                 "request": "launch",
                 "program": "${workspaceFolder}/bot.py"

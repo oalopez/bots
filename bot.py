@@ -3,6 +3,7 @@
 import json
 import os
 import pandas as pd
+import time
 
 from extractor.extractor import extract
 from transformer.transformer import transform
@@ -20,26 +21,31 @@ context_vars = {"global_vars": global_vars,
                 "local_vars": local_vars}
 
 def process():
-    # 1. Extraction process
     if not os.path.isfile(os.path.join(os.path.dirname(__file__), 'extractor.json')):
         raise Exception('Extractor file does not exist')
 
-    with open(os.path.join(os.path.dirname(__file__), 'extractor.json')) as extractor_file:
-        extractor_json = json.load(extractor_file)
-    extracted_output = extract(extractor_json, context_vars)
-
-    # 2. Transformation process
     if not os.path.isfile(os.path.join(os.path.dirname(__file__), 'transformer.json')):
         raise Exception('Transformer file does not exist')
+    
+    with open(os.path.join(os.path.dirname(__file__), 'extractor.json')) as extractor_file:
+        extractor_json = json.load(extractor_file)
+    
     with open(os.path.join(os.path.dirname(__file__), 'transformer.json')) as transformer_file:
         transformer_json = json.load(transformer_file)
-    transformed_df = transform(transformer_json, extracted_output, context_vars)
+    
+    extracted_output_page = extract(extractor_json, context_vars)
+    now = time.time()
+    part = 0
 
-    #print head of transformed_df
-    print(transformed_df.head())
-
-    #dump transformed_df to csv
-    transformed_df.to_csv("transformed_df.csv")
+    while extracted_output_page:
+        transformed_df = transform(transformer_json, extracted_output_page, context_vars)
+        #print head of transformed_df
+        print(transformed_df.head(3))
+        #dump transformed_df to csv. Append to csv if it exists. Do not include the index
+        transformed_df.to_csv('data/transformed_df_' + str(now) + '.csv', mode='a', header=False if part > 0 else True, index=False)
+        #get next page
+        part += 1
+        extracted_output_page = extract(extractor_json, context_vars, part)
 
     
     # 3. Load process

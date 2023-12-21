@@ -2,6 +2,7 @@ import json
 import requests
 import jsonpath_ng as jp
 import common.utils.exceptions as InvalidTypeException
+import common.interpreter.interpreter as interpreter
 # Global dictionary to hold all caches
 caches = {}
 
@@ -30,6 +31,7 @@ def load_new_json_cache(cache_name, cache_definition):
     cache_keys = cache_definition['keys']
     cache_value = cache_definition['value']
     source = cache_definition['source']
+    namespace = cache_definition['namespace'] if 'namespace' in cache_definition else ''
 
     if source.startswith('http'):
         json_data = load_json_url(source)
@@ -49,8 +51,8 @@ def load_new_json_cache(cache_name, cache_definition):
     for element in json_data:
         cache_key = 'PK'
         for key in cache_keys:
-            cache_key = cache_key + "_" + str(jp.parse(key).find(element)[0].value)
-        cache[cache_key] = jp.parse(cache_value).find(element)[0].value
+            cache_key = cache_key + "_" + interpreter.parse_element(key, element, None, namespace)
+        cache[cache_key] = interpreter.parse_element(cache_value, element, None, namespace)
     return cache
 
 def load_json_file(filename):

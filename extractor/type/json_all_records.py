@@ -1,33 +1,64 @@
 import jsonpath_ng as jp
 import requests
-from common.preprocessor.preprocessor import parse_element
+from common.interpreter.interpreter import parse_element
+from common.enums import PaginationType, StopSequenceType
+from common.utils.exceptions import InvalidTypeException
 
 
-def extract(rules, context_vars):
+def extract(rules, context_vars, part=0):
     json_all_records = []
 
     # 1. Read $.url, $.method, and $.params.* from rules object. 
     # TODO: think it could be a set of rules when need to extract several places - i.e. superservicios)
     rules_parsed = parse_element(rules, None, context_vars)
-    url = rules_parsed['url'] 
+    source = rules_parsed['source'] 
     method = rules_parsed['method']
     params = rules_parsed['params']
+    http_success_code = rules_parsed['success-code'] #200
 
     # 2. Read $.pagination.* from json object if exists
     pagination = rules['pagination'] if 'pagination' in rules else None
 
-    # 3. Go to URL and get json object
+    # 3. If pagination is not null, add pagination params to params object
+    if pagination:
+        pagination_type = pagination['type']
+        stop_sequece = pagination['stop-sequence']
+
+        if stop_sequece['type'] == StopSequenceType.PAGE_LIMIT.value:
+            page_limit = stop_sequece['limit']
+            if part >= int(page_limit):
+                return []
+        elif stop_sequece['type'] == StopSequenceType.NO_MORE_RECORDS.value:
+            pass
+        else:
+            raise InvalidTypeException("Stop sequence type: " + stop_sequece['type'] + " is not supported")
+
+        pagination_params = {}
+        if pagination_type == PaginationType.PARAMS.value:
+            step_size = int(pagination['next']['step-value'])
+            offset_start = int(pagination['next']['offset-start-value'])
+            pagination_params[pagination['next']['offset-param-name']] = step_size * part + offset_start
+            pagination_params[pagination['next']['step-param-name']] = step_size
+            # Update params with pagination params
+            params.update(pagination_params)
+        else:
+            raise InvalidTypeException("Pagination type: " + pagination_type + " is not supported")
+
+    # 4. Go to URL and get json object
     if method.lower() == "get":
-        response = requests.get(url, params=params)
+        response = requests.get(source, params=params)
     elif method.lower() == "post":
-        response = requests.post(url, data=params)
+        response = requests.post(source, data=params)
     else:
         raise ValueError("Invalid method: " + method)
 
-    # 4. If $.pagination.* exists, go to next page
-    if pagination:
-        # TODO: implement pagination
-        pass
+    # 5. Check if response status code is 200
+    if response.status_code != int(http_success_code):
+        raise Exception("HTTP error code: " +
+                         str(response.status_code) + 
+                         ". Message: " + response.text + 
+                         ". Source: " + source + 
+                         ". Params: " + str(params))
     
     # 5. Append json object to json_all_records
     json_all_records.append(response.json())

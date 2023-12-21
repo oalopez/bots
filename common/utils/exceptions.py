@@ -7,6 +7,12 @@ class RequiredFieldException(Exception):
 
 class InvalidTypeException(Exception):
     pass
+
+class CustomFunctionException(Exception):
+    pass
+
+class InvalidFormulaException(Exception):
+    pass
         
 def handle_transformation_exception(exception, strategy="raise"):
     if strategy == "raise":
@@ -17,4 +23,4 @@ def handle_transformation_exception(exception, strategy="raise"):
     elif strategy == "omit":
         pass
     else:
-        raise InvalidTypeException(f"Exception strategy '{strategy}' not supported")
+        raise InvalidTypeException(f"Exception strategy type '{strategy}' not supported")

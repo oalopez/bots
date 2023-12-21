@@ -1,6 +1,6 @@
 from jsonpath_ng import parse, jsonpath
 
-def pre_process(jsonpath_string, json):
+def interpret(jsonpath_string, json):
     """
     Pre-process function. 
     """
