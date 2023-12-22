@@ -1,4 +1,3 @@
-import jsonpath_ng as jp
 import requests
 from common.interpreter.interpreter import parse_element
 from common.enums import PaginationType, StopSequenceType

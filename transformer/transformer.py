@@ -24,9 +24,7 @@ def transform(transformer_json, extracted_json_output, context_vars):
     
 
     for index, element in enumerate(jsonpath_expression.find(extracted_json_output)):
-        if(index % 100 == 0):
-            print('Processing element ' + str(index) + ". Time elapsed: " + str(pd.Timestamp.now() - timestamp))
-
+        
         for field_mapping in transformer_json['field-mappings']: 
             field_name = field_mapping['field-name']
             optional = field_mapping['optional']

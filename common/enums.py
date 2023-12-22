@@ -9,8 +9,8 @@ class TransformationType(Enum):
     JSON_SOURCE = "json-source"
     CACHE="cache"
 
-class LoaderType(Enum):
-    pass
+class OutputType(Enum):
+    CSV = "csv"
 
 class PaginationType(Enum):
     PARAMS = "params"

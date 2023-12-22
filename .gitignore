@@ -6,3 +6,4 @@ logs/app.log
 logs/error.log
 full_transformed_df.csv
 data/*
+outputdata/**

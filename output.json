@@ -1,0 +1,23 @@
+{
+    "version": "1.0",
+    "description": "CSV definition for Financial Statements.",
+    "output": {
+        "type": "csv",
+        "rules":{
+            "folder": "./outputdata/finan",
+            "file-name": "finan_@python(custom_function.now(%Y%m%d))_Superfinanciera_@python(custom_function.randint(1000,9999)).csv",
+            "separator": "~{<",
+            "encoding": "utf-8",
+            "field-mapping": [
+                "TIPO_IDENTIFICACION",
+                "IDENTIFICACION",
+                "RAZON",
+                "CODIGO_CUENTA",
+                "DESCRIPCION_CUENTA",
+                "VALOR",
+                "NIIF",
+                "FECHA_FINANZAS"
+            ]
+        }
+    }
+}
