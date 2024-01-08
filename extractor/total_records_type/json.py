@@ -2,10 +2,10 @@ import requests
 import jsonpath_ng as jp
 from extractor.type.json_all_records import parse_element
 
-def total_records(tr_element, context_vars):
+def total_records(base_directory, tr_element, context_vars):
     
     total_records = 0
-    tr_element = parse_element(tr_element, None, context_vars)
+    tr_element = parse_element(base_directory, tr_element, None, context_vars)
     method = tr_element['value']['method']
     source = tr_element['value']['source']
     params = tr_element['value']['params']

@@ -6,28 +6,28 @@ import common.interpreter.python_interpreter as python_interpreter
 import common.interpreter.jsonpath_interpreter as jsonpath_interpreter
 import common.utils.exceptions as ex
 
-def parse_element(value_obj, element, context_vars, namespace=''):
+def parse_element(base_directory, value_obj, element, context_vars, namespace=''):
     # if value is str
     if isinstance(value_obj, str):
-        return special_functions_interpreter(value_obj, element, context_vars, namespace)
+        return special_functions_interpreter(base_directory, value_obj, element, context_vars, namespace)
     if isinstance(value_obj, dict):
-        return dict_interpreter(value_obj, element, context_vars, namespace)
+        return dict_interpreter(base_directory, value_obj, element, context_vars, namespace)
     if isinstance(value_obj, list):
-        return list_interpreter(value_obj, element, context_vars, namespace)
+        return list_interpreter(base_directory, value_obj, element, context_vars, namespace)
 
-def dict_interpreter(dict, element, context_vars, namespace):
+def dict_interpreter(base_directory, dict, element, context_vars, namespace):
     interpreted_dict = {}
     for key, value in dict.items():
-        interpreted_dict[key] = parse_element(value, element, context_vars, namespace)
+        interpreted_dict[key] = parse_element(base_directory, value, element, context_vars, namespace)
     return interpreted_dict
 
-def list_interpreter(list, element, context_vars, namespace):
+def list_interpreter(base_directory, list, element, context_vars, namespace):
     interpreteded_list = []
     for value in list:
-        interpreteded_list.append(parse_element(value, element, context_vars, namespace))
+        interpreteded_list.append(parse_element(base_directory, value, element, context_vars, namespace))
     return interpreteded_list
 
-def special_functions_interpreter(string, element=None, context_vars=None, namespace=''):
+def special_functions_interpreter(base_directory, string, element=None, context_vars=None, namespace=''):
     new_string = string
 
     namespace_prefix = namespace + '.'  if namespace != '' else ''
@@ -61,7 +61,7 @@ def special_functions_interpreter(string, element=None, context_vars=None, names
         elif python_string in new_string:
             value = get_formula_content(new_string, python_string)
             pattern = r"@{}python\((?:[^)(]+|\([^)]*\))*\)".format(re.escape(namespace_prefix))
-            interpreted_value = python_interpreter.interpret(value)
+            interpreted_value = python_interpreter.interpret(base_directory, value)
 
         old_string = new_string    
         new_string = re.sub(pattern, 

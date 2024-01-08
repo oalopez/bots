@@ -1,9 +1,10 @@
 # logging_config.py
 
 import logging
+import os
 from colorlog import ColoredFormatter
 
-def setup_logger():
+def setup_logger(base_directory):
 
     # Create a formatter that will color our log records
     color_formatter = ColoredFormatter(
@@ -30,11 +31,11 @@ def setup_logger():
     console_handler.setFormatter(color_formatter)
 
     # Create a FileHandler for app.log
-    app_file_handler = logging.FileHandler('logs/app.log')
+    app_file_handler = logging.FileHandler(os.path.join(base_directory, 'logs/app.log'))
     app_file_handler.setFormatter(basic_formatter)
 
     # Create a FileHandler for error.log with level ERROR
-    error_file_handler = logging.FileHandler('logs/error.log')
+    error_file_handler = logging.FileHandler(os.path.join(base_directory, 'logs/error.log'))
     error_file_handler.setLevel(logging.ERROR)
     error_file_handler.setFormatter(basic_formatter)
 

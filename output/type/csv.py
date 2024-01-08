@@ -1,9 +1,9 @@
 import os
 from common.interpreter.interpreter import parse_element
 
-def generate_output(config_json, df, context_vars, output_id=None):
+def generate_output(base_directory, config_json, df, context_vars, output_id=None):
     rules = config_json['output']['rules']
-    rules = parse_element(rules, None, context_vars, namespace='')
+    rules = parse_element(base_directory, rules, None, context_vars, namespace='')
 
     if not output_id:
         output_id = rules['file-name']
@@ -18,21 +18,21 @@ def generate_output(config_json, df, context_vars, output_id=None):
     df.reset_index(drop=True, inplace=True)
 
     # save to csv
-    to_custom_csv_append(df, output_folder, output_id, output_separator, output_encoding)
+    to_custom_csv_append(base_directory, df, output_folder, output_id, output_separator, output_encoding)
         
     return output_id
 
 
 import os
 
-def to_custom_csv_append(df, foldername, filename, sep, encoding):
+def to_custom_csv_append(base_directory, df, foldername, filename, sep, encoding):
 
     if not os.path.exists(foldername):
         os.makedirs(foldername)
 
     # Check if file exists to decide on writing header
-    file_exists = os.path.isfile(os.path.join(foldername, filename))
-    
+    file_exists = os.path.isfile(os.path.join(base_directory, foldername, filename))
+        
     # Convert DataFrame to CSV string with custom separator
     csv_string = '\n'.join([sep.join(map(str, row)) for row in df.values])
     
@@ -42,5 +42,5 @@ def to_custom_csv_append(df, foldername, filename, sep, encoding):
         csv_string = header + '\n' + csv_string
 
     # Append to file
-    with open(os.path.join(foldername, filename), 'a', encoding=encoding) as file:
+    with open(os.path.join(base_directory, foldername, filename), 'a', encoding=encoding) as file:
         file.write(csv_string + '\n')

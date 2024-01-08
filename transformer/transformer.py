@@ -9,7 +9,7 @@ from common.utils.exceptions import RequiredFieldException, InvalidTypeException
 import pandas as pd
 
 
-def transform(transformer_json, extracted_json_output, context_vars):
+def transform(base_directory, transformer_json, extracted_json_output, context_vars):
 
     df = pd.DataFrame()
     jsonpath_expression = jp.parse(transformer_json['elements-iterator-jsonpath'])
@@ -28,11 +28,11 @@ def transform(transformer_json, extracted_json_output, context_vars):
         for field_mapping in transformer_json['field-mappings']: 
             field_name = field_mapping['field-name']
             optional = field_mapping['optional']
-            transformation_element_parsed = parse_element(field_mapping['transformation'], element.value, context_vars, namespace='')
+            transformation_element_parsed = parse_element(base_directory, field_mapping['transformation'], element.value, context_vars, namespace='')
             calculated_value = None
             try:            
                 exception_strategy = None if 'exception-strategy' not in transformation_element_parsed else transformation_element_parsed['exception-strategy']
-                calculated_value = calculate_transformation(field_name, transformation_element_parsed, optional)
+                calculated_value = calculate_transformation(base_directory, field_name, transformation_element_parsed, optional)
             except RequiredFieldException as rfe:
                 handle_transformation_exception(rfe, exception_strategy)
 
@@ -42,7 +42,7 @@ def transform(transformer_json, extracted_json_output, context_vars):
 
     return df
         
-def calculate_transformation(field_name, transformation, optional=False):
+def calculate_transformation(base_directory, field_name, transformation, optional=False):
     type = transformation['type']
     default_value = transformation['default-value']
     value = transformation['value']
@@ -64,7 +64,7 @@ def calculate_transformation(field_name, transformation, optional=False):
                            default_value=default_value)
     
     elif type == TransformationType.CACHE.value:
-        calculated_value =  cache(cache_name=field_name, 
+        calculated_value =  cache(base_directory, cache_name=field_name, 
                      cache_definition=value['cache-definition'], 
                      value_to_find=value['value-to-find'], 
                      default_value=default_value)

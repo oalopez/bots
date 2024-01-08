@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../bots-config"
 		}
 	],
 	"launch": {
@@ -11,7 +14,8 @@
                 "name": "Python: Debug bot.py",
                 "type": "python",
                 "request": "launch",
-                "program": "${workspaceFolder}/bot.py"
+                "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
+				"args": ["/Volumes/External/ext-vscode-workspaces/bots-config/superfinanciera"]
             }
 		]
 	}

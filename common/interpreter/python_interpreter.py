@@ -1,8 +1,9 @@
 import re
 import importlib
 import inspect
+import sys
 
-def interpret(function_call_string):
+def interpret(base_directory, function_call_string):
     # Regex to match 'module.function_name(arguments)'
     match = re.match(r"(\w+)\.(\w+)\((.*)\)", function_call_string)
 
@@ -10,13 +11,13 @@ def interpret(function_call_string):
         module_name = match.group(1)
         function_name = match.group(2)
         arguments = match.group(3).split(',')
-        return call_function(module_name, function_name, arguments)
+        return call_function(base_directory, module_name, function_name, arguments)
     
     #TODO: Custom Exception
     raise Exception(f"Invalid function call string: {function_call_string}")
 
-def call_function(module_name, function_name, arguments):
-    
+def call_function(base_directory, module_name, function_name, arguments):
+    sys.path.append(base_directory)
     try:
         # Dynamically import the module
         module = importlib.import_module(module_name)

@@ -4,12 +4,12 @@ from common.enums import PaginationType, StopSequenceType
 from common.utils.exceptions import InvalidTypeException
 
 
-def extract(rules, context_vars, part=0):
+def extract(base_directory, rules, context_vars, part=0):
     json_all_records = []
 
     # 1. Read $.url, $.method, and $.params.* from rules object. 
     # TODO: think it could be a set of rules when need to extract several places - i.e. superservicios)
-    rules_parsed = parse_element(rules, None, context_vars)
+    rules_parsed = parse_element(base_directory, rules, None, context_vars)
     source = rules_parsed['source'] 
     method = rules_parsed['method']
     params = rules_parsed['params']
