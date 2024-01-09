@@ -8,9 +8,6 @@ class RequiredFieldException(Exception):
 class InvalidTypeException(Exception):
     pass
 
-class CustomFunctionException(Exception):
-    pass
-
 class InvalidFormulaException(Exception):
     pass
         

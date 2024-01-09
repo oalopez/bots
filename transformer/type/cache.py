@@ -12,7 +12,7 @@ def cache(base_directory, cache_name, cache_definition, value_to_find, default_v
     if cache_definition['source-type'] == 'json': 
         if cache_name not in caches:
             # Initialize the cache
-            caches[cache_name] = load_new_json_cache(base_directory, cache_name, cache_definition)
+            caches[cache_name] = load_new_json_cache(base_directory, cache_definition)
     else:
         raise InvalidTypeException('Cache type ' + cache_definition['source-type'] + ' not supported')
 
@@ -28,7 +28,7 @@ def cache(base_directory, cache_name, cache_definition, value_to_find, default_v
     else:
         return default_value
 
-def load_new_json_cache(base_directory, cache_name, cache_definition):
+def load_new_json_cache(base_directory, cache_definition):
     cache_keys = cache_definition['keys']
     cache_value = cache_definition['value']
     source = cache_definition['source']
