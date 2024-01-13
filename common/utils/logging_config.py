@@ -27,7 +27,7 @@ def setup_logger(base_directory):
 
     # Create a console handler using the formatter
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.CRITICAL)
+    console_handler.setLevel(logging.WARNING)
     console_handler.setFormatter(color_formatter)
 
     # Create a FileHandler for app.log

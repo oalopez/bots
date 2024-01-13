@@ -11,6 +11,7 @@ from transformer.transformer import transform
 from output.output import generate_output
 
 from common.utils.logging_config import setup_logger
+from common.utils.profiling import lap_time
 
 # TODO: Handle context_vars correctly
 global_vars={"_year":"2022"}
@@ -44,6 +45,9 @@ def process(base_directory):
     with open(output_path) as output_file:
         output_json = json.load(output_file)
     
+    #parsed_extractor_json = parse_json_file(extractor_json)
+    #parsed_transformer_json = parse_json_file(transformer_json)
+    #parsed_output_json = parse_json_file(output_json)
 
     total_records_count = total_records(base_directory, extractor_json, context_vars)
     extracted_output_page = extract(base_directory, extractor_json, context_vars)
@@ -56,13 +60,14 @@ def process(base_directory):
             transformed_df = transform(base_directory, transformer_json, extracted_output_page, context_vars)
             #dump transformed_df to csv. Append to csv if it exists. Do not include the index
             transformed_df.to_csv('data/transformed_df_' + str(now) + '.csv', mode='a', header=False if part > 0 else True, index=False)
-            #get next page
-            part += 1
-            extracted_output_page = extract(base_directory, extractor_json, context_vars, part)
             #TODO: improve return type of generate_output. Handle errors better
             output_id = generate_output(base_directory, output_json, transformed_df, context_vars, output_id)
             # Update the progress bar
             pbar.update(transformed_df.shape[0])
+            #get next page
+            part += 1
+            extracted_output_page = extract(base_directory, extractor_json, context_vars, part)
+            
     pbar.close()
 
     print("Done!")

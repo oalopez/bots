@@ -1,18 +1,28 @@
 import json
 import os
+import csv
 import requests
 import jsonpath_ng as jp
 import common.utils.exceptions as InvalidTypeException
 import common.interpreter.interpreter as interpreter
+
+from common.enums import CacheSourceType
+from common.utils.profiling import lap_time
+
 # Global dictionary to hold all caches
 caches = {}
 
+@lap_time(tolerance=1)
 def cache(base_directory, cache_name, cache_definition, value_to_find, default_value):
     # Check if the cache exists, if not create it
-    if cache_definition['source-type'] == 'json': 
+    if cache_definition['source-type'] == CacheSourceType.JSON.value: 
         if cache_name not in caches:
             # Initialize the cache
             caches[cache_name] = load_new_json_cache(base_directory, cache_definition)
+    elif cache_definition['source-type'] == CacheSourceType.CSV.value:
+        if cache_name not in caches:
+            # Initialize the cache
+            caches[cache_name] = load_new_csv_cache(base_directory, cache_definition)
     else:
         raise InvalidTypeException('Cache type ' + cache_definition['source-type'] + ' not supported')
 
@@ -37,7 +47,6 @@ def load_new_json_cache(base_directory, cache_definition):
     if source.startswith('http'):
         json_data = load_json_url(source)
     else:
-        # TODO: Manage local files
         json_data = load_json_file(base_directory, source)
 
     # Given cache_keys as a list of jsonpaths (e.g. ["$.[0].cod_entidad", "$.[0].tipo_entidad"])
@@ -65,3 +74,29 @@ def load_json_url(url):
     response = requests.get(url)
     data = json.loads(response.text)
     return data
+
+
+def load_new_csv_cache(base_directory, cache_definition):
+    cache_keys = cache_definition['keys']
+    cache_value = cache_definition['value']
+    source = cache_definition['source']
+    namespace = cache_definition['namespace'] if 'namespace' in cache_definition else ''
+
+    if source.startswith('http'):
+        #csv_data = load_csv_url(source)
+        pass #TODO: Implement csv cache loading from url
+    else:
+        with open(os.path.join(base_directory, source)) as csv_file:
+            data = csv.DictReader(csv_file)
+            cache = {}
+            for row in data:
+                cache_key = 'PK'
+                for key in cache_keys:
+                    key_value = row[key]
+                    cache_key = cache_key + "_" + interpreter.parse_element(base_directory, key_value, element=None, context_vars=None, namespace=namespace)
+                # get the value of row[cache_value]
+                value = row[cache_value]
+                if cache_key not in cache:
+                    cache[cache_key] = interpreter.parse_element(base_directory, value, element=None, context_vars=None, namespace=namespace)
+
+    return cache

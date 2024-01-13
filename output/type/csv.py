@@ -41,6 +41,10 @@ def to_custom_csv_append(base_directory, df, foldername, filename, sep, encoding
         header = sep.join(df.columns)
         csv_string = header + '\n' + csv_string
 
+    # Create directory if it does not exist
+    if not os.path.exists(os.path.join(base_directory, foldername)):
+        os.makedirs(os.path.join(base_directory, foldername))
+        
     # Append to file
     with open(os.path.join(base_directory, foldername, filename), 'a', encoding=encoding) as file:
         file.write(csv_string + '\n')

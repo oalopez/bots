@@ -1,6 +1,8 @@
 from common.enums import OutputType
 from common.utils.exceptions import InvalidTypeException
+from common.utils.profiling import lap_time
 
+@lap_time(tolerance=2)
 def generate_output(base_directory, output_json, transformed_df, context_vars, output_id=None):
     output_type = output_json['output']['type']
     

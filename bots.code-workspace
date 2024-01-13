@@ -15,7 +15,7 @@
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-				"args": ["/Volumes/External/ext-vscode-workspaces/bots-config/superfinanciera"]
+				"args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-noaptitud"]
             }
 		]
 	}

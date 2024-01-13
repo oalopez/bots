@@ -1,14 +1,19 @@
 import jsonpath_ng as jp
+import pandas as pd
+
 from transformer.type.simple import simple
 from transformer.type.regex import regex
 from transformer.type.json_source import json_source
 from transformer.type.cache import cache
+from transformer.type.geometry import geometry
+
 from common.enums import TransformationType
 from common.interpreter.interpreter import parse_element
 from common.utils.exceptions import RequiredFieldException, InvalidTypeException, handle_transformation_exception
-import pandas as pd
+from common.utils.profiling import lap_time
 
 
+@lap_time(tolerance=5)
 def transform(base_directory, transformer_json, extracted_json_output, context_vars):
 
     df = pd.DataFrame()
@@ -41,7 +46,9 @@ def transform(base_directory, transformer_json, extracted_json_output, context_v
             context_vars['local_vars'][field_name] = calculated_value
 
     return df
-        
+
+
+@lap_time(tolerance=1)        
 def calculate_transformation(base_directory, field_name, transformation, optional=False):
     type = transformation['type']
     default_value = transformation['default-value']
@@ -69,6 +76,21 @@ def calculate_transformation(base_directory, field_name, transformation, optiona
                      value_to_find=value['value-to-find'], 
                      default_value=default_value)
     
+    elif type == TransformationType.GEOMETRY.value:
+        arguments = {
+            "geometry": value['geometry'],
+            "source_format": value['source-format'],
+            "target_format": value['target-format']
+        }
+        # Avoid key error when value['source-crs'] is not defined
+        if 'source-crs' in value:
+            arguments['source_crs'] = value['source-crs']
+
+        if 'target-crs' in value:
+            arguments['target_crs'] = value['target-crs']
+
+        calculated_value = geometry(**arguments)
+
     else:
         raise InvalidTypeException(f"Transformation type '{type}' not supported")
     

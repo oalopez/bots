@@ -8,3 +8,4 @@ full_transformed_df.csv
 data/*
 outputdata/**
 .DS_Store
+my_profile_report.prof
