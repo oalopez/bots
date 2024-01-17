@@ -11,9 +11,32 @@ def generate_output(df, config_json, output_id=None, cache=None):
     output_folder = rules['folder']
     output_separator = rules['separator']
     output_encoding = rules['encoding']
-    output_field_mapping = rules['field-mapping']
+    dataframe_to_output_mapping = rules['dataframe-to-output']
 
-    # Delete the columns that are not in the field mapping (fiel+mapping is an array of strings)
+    # "dataframe-to-output": [
+    #             {"field-name": "Marca"},
+    #             {"field-name": "Departamento"},
+    #             {"field-name": "Codigo_departamento"},
+    #             {"field-name": "Municipio"},
+    #             {"field-name": "Codigo_municipio"},
+    #             {"field-name": "Código_parametro"},
+    #             {"field-name": "Parametro"},
+    #             {"field-name": "Ano_parametro"},
+    #             {"field-name": "Mes_parametro"},
+    #             {"field-name": "Codigo_valor"},
+    #             {"field-name": "Valor"},
+    #             {"field-name": "Poligono"},
+    #             {"field-name": "NumId", "transformation": {"type": "int"}},
+    #             {"field-name": "Area"},
+    #             {"field-name": "Fecha_extraccion"}
+    #         ]
+    #     }
+
+    # iterate dataframe_to_output_mapping and create a list of output_field_mapping
+    output_field_mapping = []
+    for mapping in dataframe_to_output_mapping:
+        output_field_mapping.append(mapping['field-name'])
+
     df = df[output_field_mapping]
     df.reset_index(drop=True, inplace=True)
 

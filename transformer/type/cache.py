@@ -1,9 +1,10 @@
-import common.utils.exceptions as InvalidTypeException
+import logging
 
+import common.utils.exceptions as InvalidTypeException
 from common.utils.profiling import lap_time
 from common.interpreter.formula_executor import execute_node
 
-
+logger = logging.getLogger(__name__)
 
 # Global dictionary to hold all caches
 caches = {}
@@ -26,4 +27,5 @@ def cache(caches, cache_name, value_to_find, element, default_value):
     if cache_key in cache:
         return cache[cache_key]
     else:
+        logger.warn('Value not found in cache "{0}" for key "{1}"'.format(cache_name, cache_key))
         return default_value
