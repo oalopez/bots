@@ -1,5 +1,6 @@
 import jsonpath_ng as jp
 import pandas as pd
+import logging
 
 from transformer.type.simple import simple
 from transformer.type.regex import regex
@@ -8,77 +9,68 @@ from transformer.type.cache import cache
 from transformer.type.geometry import geometry
 
 from common.enums import TransformationType
-from common.interpreter.interpreter import parse_element
 from common.utils.exceptions import RequiredFieldException, InvalidTypeException, handle_transformation_exception
 from common.utils.profiling import lap_time
 
+logger = logging.getLogger(__name__)
 
 @lap_time(tolerance=5)
-def transform(base_directory, transformer_json, extracted_json_output, context_vars):
+def transform(extracted_json_output, parsed_transformer, transformer_caches, pbar=None):
 
     df = pd.DataFrame()
-    jsonpath_expression = jp.parse(transformer_json['elements-iterator-jsonpath'])
-    # Timestamp for performance
-    timestamp = pd.Timestamp.now()
-
-    # Iterate over all elements from json source
-
-    # for this expression jsonpath_expression.find(extracted_json_output) return only the 1st element
-    # for element in jsonpath_expression.find(extracted_json_output):
-    #     print(element.value)
+    jsonpath_expression = jp.parse(parsed_transformer['elements-iterator-jsonpath'])
     
-
     for index, element in enumerate(jsonpath_expression.find(extracted_json_output)):
         
-        for field_mapping in transformer_json['field-mappings']: 
+        # get the actual json element
+        element = element.value
+
+        for field_mapping in parsed_transformer['field-mappings']: # cambiar por iterar un dict de mapeo de funciones precargada
+
             field_name = field_mapping['field-name']
             optional = field_mapping['optional']
-            transformation_element_parsed = parse_element(base_directory, field_mapping['transformation'], element.value, context_vars, namespace='')
-            calculated_value = None
+            transformed_value = None
             try:            
-                exception_strategy = None if 'exception-strategy' not in transformation_element_parsed else transformation_element_parsed['exception-strategy']
-                calculated_value = calculate_transformation(base_directory, field_name, transformation_element_parsed, optional)
+                exception_strategy = None if 'exception-strategy' not in field_mapping else field_mapping['exception-strategy']
+                transformed_value = transform_by_type(element, field_mapping['transformation'], field_name, optional, transformer_caches)
             except RequiredFieldException as rfe:
                 handle_transformation_exception(rfe, exception_strategy)
 
             # Add calculated value to dataframe. The data frame should have an index with the element id
-            df.loc[index, field_name] = calculated_value
-            context_vars['local_vars'][field_name] = calculated_value
+            df.loc[index, field_name] = transformed_value
+            #context_vars['local_vars'][field_name] = transformed_value
+        
+        pbar.update(1)
+
+    try: 
+        save_partial_results(df)
+    except Exception as e:
+        logger.error(f"Error saving partial results dataframe: {e}")
 
     return df
 
 
 @lap_time(tolerance=1)        
-def calculate_transformation(base_directory, field_name, transformation, optional=False):
+def transform_by_type(element, transformation, field_name, optional=False, caches=None):
     type = transformation['type']
     default_value = transformation['default-value']
     value = transformation['value']
     calculated_value = None
         
     if type == TransformationType.SIMPLE.value:
-        calculated_value = simple(value=value, 
-                      default_value=default_value)
-    
-    elif type == TransformationType.REGEX.value:
-        calculated_value =  regex(element=value['element'], 
-                     pattern=value['pattern'], 
-                     replacement=value['replacement'], 
-                     default_value=default_value)
-    
-    elif type == TransformationType.JSON_SOURCE.value:
-        calculated_value =  json_source(source=value['source'], 
-                           element_to_extract=value['element-to-extract'], 
-                           default_value=default_value)
+        calculated_value = simple(value=value, default_value=default_value, json_data=element)
     
     elif type == TransformationType.CACHE.value:
-        calculated_value =  cache(base_directory, cache_name=field_name, 
-                     cache_definition=value['cache-definition'], 
-                     value_to_find=value['value-to-find'], 
-                     default_value=default_value)
+        calculated_value =  cache(caches, 
+                                  cache_name=value['cache-name'], 
+                                  value_to_find=value['value-to-find'], 
+                                  element=element,
+                                  default_value=default_value)
     
     elif type == TransformationType.GEOMETRY.value:
         arguments = {
             "geometry": value['geometry'],
+            "element": element,
             "source_format": value['source-format'],
             "target_format": value['target-format']
         }
@@ -98,3 +90,15 @@ def calculate_transformation(base_directory, field_name, transformation, optiona
         raise RequiredFieldException(f"Field {field_name} is required. Transformation: {transformation}")
 
     return calculated_value
+
+
+def save_partial_results(partial_results_df):
+    #TODO: implement for retries strategy
+    pass
+    # base_directory = GlobalState.get_value(GlobalStateKeys.BASE_DIRECTORY)
+    # #dump transformed_df to csv. Append to csv if it exists. Do not include the index
+    # partial_results_df.to_csv(base_directory + 'data/transformed_df_' + 
+    #                           str(now) + '.csv', 
+    #                           mode='a', 
+    #                           header=False if part > 0 else True, index=False)
+            

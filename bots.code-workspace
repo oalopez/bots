@@ -1,22 +1,35 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../bots-config"
-		}
-	],
-	"launch": {
-		"version": "0.2.0",
-		"configurations": [
-			{
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "../bots-config"
+        }
+    ],
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
                 "name": "Python: Debug bot.py",
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-				"args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-noaptitud"]
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-noaptitud"]
+            },
+            {
+                "name": "Python: Unittest Discover",
+                "type": "python",
+                "request": "launch",
+                "module": "unittest",
+                "args": [
+                    "discover",
+                    "-s", "/Volumes/External/ext-vscode-workspaces/bots/tests",  // Replace with the path to your test directory
+                    "-p", "test_*.py"             // Pattern to match test files
+                    // Optionally, add other arguments as needed
+                ],
+                // Include any additional configurations needed for your environment
             }
-		]
-	}
+        ]
+    }
 }

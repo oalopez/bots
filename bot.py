@@ -8,70 +8,66 @@ import argparse
 
 from extractor.extractor import extract, total_records
 from transformer.transformer import transform
-from output.output import generate_output
+from output.output import output
 
+from common.interpreter.cache_interpreter import load_caches
 from common.utils.logging_config import setup_logger
 from common.utils.profiling import lap_time
-
-# TODO: Handle context_vars correctly
-global_vars={"_year":"2022"}
-local_vars = {}
-
-context_vars = {"global_vars": global_vars, 
-                "local_vars": local_vars}
+from common.interpreter.formula_parser import parse_json_structure
+from common.global_state import GlobalStateKeys, global_state
 
 def process(base_directory):
-    setup_logger(base_directory)
 
-    extractor_path = os.path.join(base_directory, 'extractor.json')
-    transformer_path = os.path.join(base_directory, 'transformer.json')
-    output_path = os.path.join(base_directory, 'output.json')
+    global_state.set_value(GlobalStateKeys.CURRENT_BASE_DIR, base_directory)
 
-    if not os.path.isfile(extractor_path):
-        raise Exception('Extractor file does not exist')
+    setup_logger()
+    extractor_json = load_json_file(base_directory, 'extractor.json')
+    transformer_json = load_json_file(base_directory, 'transformer.json')
+    output_json = load_json_file(base_directory, 'output.json')
 
-    if not os.path.isfile(transformer_path):
-        raise Exception('Transformer file does not exist')
-    
-    if not os.path.isfile(output_path):
-        raise Exception('Loader file does not exist')
-    
-    with open(extractor_path) as extractor_file:
-        extractor_json = json.load(extractor_file)
-    
-    with open(transformer_path) as transformer_file:
-        transformer_json = json.load(transformer_file)
+    extractor_caches, parsed_extractor_json = parse_json_file(extractor_json)
+    transformer_caches, parsed_transformer_json = parse_json_file(transformer_json)
+    output_caches, parsed_output_json = parse_json_file(output_json)
 
-    with open(output_path) as output_file:
-        output_json = json.load(output_file)
-    
-    #parsed_extractor_json = parse_json_file(extractor_json)
-    #parsed_transformer_json = parse_json_file(transformer_json)
-    #parsed_output_json = parse_json_file(output_json)
-
-    total_records_count = total_records(base_directory, extractor_json, context_vars)
-    extracted_output_page = extract(base_directory, extractor_json, context_vars)
-    now = time.time()
     part = 0
-
+    total_records_count = total_records(parsed_extractor_json, extractor_caches)
+    extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
     output_id = None
+
     with tqdm.tqdm(total=int(total_records_count), desc="Processing", unit=' records', colour='green') as pbar:
         while extracted_output_page:
-            transformed_df = transform(base_directory, transformer_json, extracted_output_page, context_vars)
-            #dump transformed_df to csv. Append to csv if it exists. Do not include the index
-            transformed_df.to_csv('data/transformed_df_' + str(now) + '.csv', mode='a', header=False if part > 0 else True, index=False)
+            transformed_df = transform(extracted_output_page, parsed_transformer_json, transformer_caches, pbar)
+            
             #TODO: improve return type of generate_output. Handle errors better
-            output_id = generate_output(base_directory, output_json, transformed_df, context_vars, output_id)
+            output_id = output(transformed_df, parsed_output_json, output_id, output_caches)
+            
             # Update the progress bar
-            pbar.update(transformed_df.shape[0])
+            # pbar.update(transformed_df.shape[0])
+            
             #get next page
             part += 1
-            extracted_output_page = extract(base_directory, extractor_json, context_vars, part)
+            extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
             
     pbar.close()
 
     print("Done!")
+
+def load_json_file(base_directory, filename):
+    json_file = None
+    file_path = os.path.join(base_directory, filename)
+    if not os.path.isfile(file_path):
+        raise Exception(f'File {file_path} does not exist')
+    with open(file_path) as file:
+        json_file = json.load(file)
+    return json_file
+
+def parse_json_file(json):
     
+    parsed_json = parse_json_structure(json)
+    caches = load_caches(parsed_json)
+
+    return caches, parsed_json
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Bot input files.')
     parser.add_argument('base_directory', type=str, help='Base directory containing the JSON files (output.json, extractor.json, transformer.json)')

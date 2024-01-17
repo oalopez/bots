@@ -1,12 +1,12 @@
 import os
-from common.interpreter.interpreter import parse_element
+from common.global_state import GlobalStateKeys, global_state
+from common.interpreter.formula_executor import execute_node
 
-def generate_output(base_directory, config_json, df, context_vars, output_id=None):
+def generate_output(df, config_json, output_id=None, cache=None):
     rules = config_json['output']['rules']
-    rules = parse_element(base_directory, rules, None, context_vars, namespace='')
-
+    
     if not output_id:
-        output_id = rules['file-name']
+        output_id = execute_node(rules['file-name-value'])
 
     output_folder = rules['folder']
     output_separator = rules['separator']
@@ -18,15 +18,17 @@ def generate_output(base_directory, config_json, df, context_vars, output_id=Non
     df.reset_index(drop=True, inplace=True)
 
     # save to csv
-    to_custom_csv_append(base_directory, df, output_folder, output_id, output_separator, output_encoding)
+    to_custom_csv_append(df, output_folder, output_id, output_separator, output_encoding)
         
     return output_id
 
 
 import os
 
-def to_custom_csv_append(base_directory, df, foldername, filename, sep, encoding):
+def to_custom_csv_append(df, foldername, filename, sep, encoding):
 
+    base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
+    
     if not os.path.exists(foldername):
         os.makedirs(foldername)
 

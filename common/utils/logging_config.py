@@ -1,11 +1,22 @@
 # logging_config.py
 
-import logging
 import os
+import logging
+from logging.handlers import TimedRotatingFileHandler
 from colorlog import ColoredFormatter
+from common.global_state import GlobalStateKeys, global_state
 
-def setup_logger(base_directory):
 
+def setup_logger():
+
+    base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
+    if not base_directory:
+        raise ValueError("Base directory is not set")
+
+    # Create the logs directory if it doesn't exist
+    if not os.path.exists(os.path.join(base_directory, 'logs')):
+        os.makedirs(os.path.join(base_directory, 'logs'))
+    
     # Create a formatter that will color our log records
     color_formatter = ColoredFormatter(
         "%(log_color)s%(asctime)s - %(name)s - %(levelname)s - %(message)s%(reset)s",
@@ -30,12 +41,21 @@ def setup_logger(base_directory):
     console_handler.setLevel(logging.WARNING)
     console_handler.setFormatter(color_formatter)
 
-    # Create a FileHandler for app.log
-    app_file_handler = logging.FileHandler(os.path.join(base_directory, 'logs/app.log'))
+    # Create a TimedRotatingFileHandler for app.log
+    app_file_handler = TimedRotatingFileHandler(
+        os.path.join(base_directory, 'logs/app.log'), 
+        when='midnight', 
+        backupCount=15  # Keep last 15 days of logs
+    )
+    app_file_handler.setLevel(logging.INFO)
     app_file_handler.setFormatter(basic_formatter)
 
-    # Create a FileHandler for error.log with level ERROR
-    error_file_handler = logging.FileHandler(os.path.join(base_directory, 'logs/error.log'))
+    # Create a TimedRotatingFileHandler for error.log with level ERROR
+    error_file_handler = TimedRotatingFileHandler(
+        os.path.join(base_directory, 'logs/error.log'), 
+        when='midnight', 
+        backupCount=15  # Keep last 15 days of logs
+    )
     error_file_handler.setLevel(logging.ERROR)
     error_file_handler.setFormatter(basic_formatter)
 

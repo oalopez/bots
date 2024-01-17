@@ -5,9 +5,10 @@ from shapely.ops import transform as shapely_transform
 from common.enums import GeometryFormat
 from common.enums import CoordinateReference
 from common.utils.exceptions import InvalidTypeException
+from common.interpreter.formula_executor import execute_node
 import json
 
-def geometry(geometry, source_format, target_format, source_crs=CoordinateReference.WGS84_4326.value, target_crs=CoordinateReference.WGS84_4326.value):
+def geometry(geometry, element, source_format, target_format, source_crs=CoordinateReference.WGS84_4326.value, target_crs=CoordinateReference.WGS84_4326.value):
     if source_format != GeometryFormat.GEOJSON.value or target_format != GeometryFormat.WKT.value:
         raise InvalidTypeException("Unsupported format conversion: {} to {}".format(source_format, target_format))
 
@@ -17,6 +18,8 @@ def geometry(geometry, source_format, target_format, source_crs=CoordinateRefere
     if target_crs != CoordinateReference.WGS84_4326.value:
         raise InvalidTypeException("Unsupported target CRS: " + target_crs)
     
+    geometry = execute_node(geometry, element)
+
     # If source and target formats are the same, no need to convert
     if source_format == target_format:
         return geometry
@@ -30,8 +33,6 @@ def geometry(geometry, source_format, target_format, source_crs=CoordinateRefere
             return transformer.transform(*coord)
 
     # Convert GeoJSON to Shapely Geometry
-    # geometry is str convert it to json
-    geometry = json.loads(geometry)
     shapely_geom = shape(geometry)
 
     transformed_geom = shapely_geom
