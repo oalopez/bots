@@ -2,9 +2,9 @@
 
 import json
 import os
-import time
 import tqdm
 import argparse
+import logging
 
 from extractor.extractor import extract, total_records
 from transformer.transformer import transform
@@ -16,39 +16,48 @@ from common.utils.profiling import lap_time
 from common.interpreter.formula_parser import parse_json_structure
 from common.global_state import GlobalStateKeys, global_state
 
+logger = logging.getLogger(__name__)
+
 def process(base_directory):
+        
+    try:
+        global_state.set_value(GlobalStateKeys.CURRENT_BASE_DIR, base_directory)
 
-    global_state.set_value(GlobalStateKeys.CURRENT_BASE_DIR, base_directory)
+        setup_logger()
+        extractor_json = load_json_file(base_directory, 'extractor.json')
+        transformer_json = load_json_file(base_directory, 'transformer.json')
+        output_json = load_json_file(base_directory, 'output.json')
 
-    setup_logger()
-    extractor_json = load_json_file(base_directory, 'extractor.json')
-    transformer_json = load_json_file(base_directory, 'transformer.json')
-    output_json = load_json_file(base_directory, 'output.json')
+        extractor_caches, parsed_extractor_json = parse_json_file(extractor_json)
+        transformer_caches, parsed_transformer_json = parse_json_file(transformer_json)
+        output_caches, parsed_output_json = parse_json_file(output_json)
 
-    extractor_caches, parsed_extractor_json = parse_json_file(extractor_json)
-    transformer_caches, parsed_transformer_json = parse_json_file(transformer_json)
-    output_caches, parsed_output_json = parse_json_file(output_json)
+        part = 0
+        total_records_count = total_records(parsed_extractor_json, extractor_caches)
+        extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
+        output_id = None
 
-    part = 0
-    total_records_count = total_records(parsed_extractor_json, extractor_caches)
-    extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
-    output_id = None
+        with tqdm.tqdm(total=int(total_records_count), desc="Processing", unit=' records', colour='green') as pbar:
+            while extracted_output_page:
+                transformed_df = transform(extracted_output_page, parsed_transformer_json, transformer_caches, pbar)
+                
+                #TODO: improve return type of generate_output. Handle errors better
+                output_id = output(transformed_df, parsed_output_json, output_id, output_caches)
+                
+                #get next page
+                part += 1
+                extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
+                
+        pbar.close()
+    except Exception as e:
+        # print the full traceback
+        import traceback
+        traceback.print_exc() # <-- this prints it to stdout
+        logger.error(traceback.format_exc()) 
 
-    with tqdm.tqdm(total=int(total_records_count), desc="Processing", unit=' records', colour='green') as pbar:
-        while extracted_output_page:
-            transformed_df = transform(extracted_output_page, parsed_transformer_json, transformer_caches, pbar)
-            
-            #TODO: improve return type of generate_output. Handle errors better
-            output_id = output(transformed_df, parsed_output_json, output_id, output_caches)
-            
-            # Update the progress bar
-            # pbar.update(transformed_df.shape[0])
-            
-            #get next page
-            part += 1
-            extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
-            
-    pbar.close()
+        print(f"Error processing: {e}")
+        logger.error(f"Error processing: {e}")
+
 
     print("Done!")
 

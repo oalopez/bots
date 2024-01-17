@@ -1,4 +1,5 @@
 import requests
+import jsonpath_ng as jp
 from common.enums import PaginationType, StopSequenceType
 from common.utils.exceptions import InvalidTypeException
 
@@ -26,7 +27,7 @@ def extract(rules, part=0):
             if part >= int(page_limit):
                 return []
         elif stop_sequece['type'] == StopSequenceType.NO_MORE_RECORDS.value:
-            pass
+            pass # it will be evaluated again at the end of the function. After the request
         else:
             raise InvalidTypeException("Stop sequence type: " + stop_sequece['type'] + " is not supported")
 
@@ -60,6 +61,16 @@ def extract(rules, part=0):
     # 5. Append json object to json_all_records
     json_all_records.append(response.json())
 
-    # 6. Return json_all_records
+    # 6. Check if pagination is not null and stop-sequence is NO_MORE_RECORDS. If so, check if jsonpath is empty. If so, return empty list.
+    if pagination:
+        pagination_type = pagination['type']
+        stop_sequece = pagination['stop-sequence']
+        if stop_sequece['type'] == StopSequenceType.NO_MORE_RECORDS.value:
+                empty_element_eval = stop_sequece['empty-element-jsonpath']
+                empty_element_value = jp.parse(empty_element_eval).find(response.json())
+                if len(empty_element_value) == 0:
+                    return []   
+
+    # 7. Return json_all_records
     return json_all_records
 

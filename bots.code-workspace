@@ -5,6 +5,9 @@
         },
         {
             "path": "../bots-config"
+        },
+        {
+            "path": "../../ext-data/upra-nacional/output-new-bot"
         }
     ],
     "launch": {

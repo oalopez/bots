@@ -52,6 +52,12 @@ def to_custom_csv_append(df, foldername, filename, sep, encoding):
 
     base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
     
+    # if folder name starts with /, it is considered an absolute path
+    # otherwise, it is considered a relative path and is appended to the base directory
+    if not foldername.startswith('/'):
+        foldername = os.path.join(base_directory, foldername)
+
+    # Create folder if it does not exist
     if not os.path.exists(foldername):
         os.makedirs(foldername)
 
