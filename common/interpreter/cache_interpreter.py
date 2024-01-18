@@ -64,8 +64,15 @@ def load_csv_cache(cache_rules):
         #csv_data = load_csv_url(source)
         pass #TODO: Implement csv cache loading from url
     else:
-        base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
-        with open(os.path.join(base_directory, source)) as csv_file:
+
+        # if source starts with /, it is an absolute path, else it is a relative path to the base directory
+        if source.startswith('/'):
+            directory = source
+        else:
+            base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
+            directory = os.path.join(base_directory, source)
+            
+        with open(os.path.join(directory, source)) as csv_file:
             data = csv.DictReader(csv_file)
             cache = {}
             for row in data:

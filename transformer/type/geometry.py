@@ -1,12 +1,15 @@
 from pyproj import Proj, transform, Transformer
 from shapely.geometry import shape, Polygon, MultiPolygon
 from shapely.ops import transform as shapely_transform
+import logging
 
 from common.enums import GeometryFormat
 from common.enums import CoordinateReference
 from common.utils.exceptions import InvalidTypeException
 from common.interpreter.formula_executor import execute_node
-import json
+
+
+logger = logging.getLogger(__name__)
 
 def geometry(geometry, element, source_format, target_format, source_crs=CoordinateReference.WGS84_4326.value, target_crs=CoordinateReference.WGS84_4326.value):
     if source_format != GeometryFormat.GEOJSON.value or target_format != GeometryFormat.WKT.value:
@@ -33,7 +36,12 @@ def geometry(geometry, element, source_format, target_format, source_crs=Coordin
             return transformer.transform(*coord)
 
     # Convert GeoJSON to Shapely Geometry
-    shapely_geom = shape(geometry)
+    if geometry is not None:
+        shapely_geom = shape(geometry)
+    else:
+        # create an empty polygon
+        logger.warn('Empty geometry. Element: ' + str(element))
+        shapely_geom = Polygon()
 
     transformed_geom = shapely_geom
     if source_crs != target_crs:

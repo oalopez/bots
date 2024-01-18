@@ -7,6 +7,7 @@ from transformer.type.regex import regex
 from transformer.type.json_source import json_source
 from transformer.type.cache import cache
 from transformer.type.geometry import geometry
+from shapely.geometry import Polygon
 
 from common.enums import TransformationType
 from common.utils.exceptions import RequiredFieldException, InvalidTypeException, handle_transformation_exception
@@ -82,6 +83,10 @@ def transform_by_type(element, transformation, field_name, optional=False, cache
             arguments['target_crs'] = value['target-crs']
 
         calculated_value = geometry(**arguments)
+        # if calculated_value is instance of Polygon and it is empty, return None
+        if isinstance(calculated_value, Polygon) and calculated_value.is_empty:
+            calculated_value = None
+
 
     else:
         raise InvalidTypeException(f"Transformation type '{type}' not supported")
@@ -93,7 +98,8 @@ def transform_by_type(element, transformation, field_name, optional=False, cache
 
 
 def save_partial_results(partial_results_df):
-    #TODO: implement for retries strategy
+    #TODO: implement for retries strategy (its possible that the code is already prepared for this, 
+    #       because the file is saved with partial results)
     pass
     # base_directory = GlobalState.get_value(GlobalStateKeys.BASE_DIRECTORY)
     # #dump transformed_df to csv. Append to csv if it exists. Do not include the index

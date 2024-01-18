@@ -14,11 +14,18 @@
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "Python: Debug bot.py",
+                "name": "Python: Debug Exclusiones",
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-noaptitud"]
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-exclusiones"]
+            },
+            {
+                "name": "Python: Debug Mercado Tierras",
+                "type": "python",
+                "request": "launch",
+                "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-mercado_tierras"]
             },
             {
                 "name": "Python: Unittest Discover",
