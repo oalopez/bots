@@ -18,14 +18,21 @@
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-exclusiones"]
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/sipra-nal/exclusiones"]
             },
             {
                 "name": "Python: Debug Mercado Tierras",
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co.sipra-nal-mercado_tierras"]
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/sipra-nal/mercado_tierras"]
+            },
+            {
+                "name": "reduce_wkt_precision",
+                "type": "python",
+                "request": "launch",
+                "program": "/Volumes/External/ext-vscode-workspaces/bots-config/resources/scripts/reduce_wkt_precision.py",
+                "args": []
             },
             {
                 "name": "Python: Unittest Discover",

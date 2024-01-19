@@ -10,7 +10,12 @@ class InvalidTypeException(Exception):
 
 class InvalidFormulaException(Exception):
     pass
-        
+
+class JsonResponseError(Exception):
+    def __init__(self, message="", should_continue=False):
+        super().__init__(message)
+        self.should_continue = should_continue
+
 def handle_transformation_exception(exception, strategy="raise"):
     if strategy == "raise":
         logger.error(exception)

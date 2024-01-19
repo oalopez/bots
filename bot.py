@@ -5,6 +5,7 @@ import os
 import tqdm
 import argparse
 import logging
+import requests
 
 from extractor.extractor import extract, total_records
 from transformer.transformer import transform
@@ -15,6 +16,7 @@ from common.utils.logging_config import setup_logger
 from common.utils.profiling import lap_time
 from common.interpreter.formula_parser import parse_json_structure
 from common.global_state import GlobalStateKeys, global_state
+from common.utils.exceptions import JsonResponseError
 
 logger = logging.getLogger(__name__)
 
@@ -34,19 +36,31 @@ def process(base_directory):
 
         part = 0
         total_records_count = total_records(parsed_extractor_json, extractor_caches)
+
         extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
+        extraction_error = False
         output_id = None
 
         with tqdm.tqdm(total=int(total_records_count), desc="Processing", unit=' records', colour='green') as pbar:
             while extracted_output_page:
-                transformed_df = transform(extracted_output_page, parsed_transformer_json, transformer_caches, pbar)
                 
-                #TODO: improve return type of generate_output. Handle errors better
-                output_id = output(transformed_df, parsed_output_json, output_id, output_caches)
+                if not extraction_error:
+                    transformed_df = transform(extracted_output_page, parsed_transformer_json, transformer_caches, pbar)
+                    output_id = output(transformed_df, parsed_output_json, output_id, output_caches)
                 
-                #get next page
-                part += 1
-                extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
+                try:
+                    #get next page
+                    part += 1
+                    extracted_output_page = extract(parsed_extractor_json, part, extractor_caches)
+                    extraction_error = False
+                except (json.decoder.JSONDecodeError, requests.exceptions.RequestException) as e:
+                    logger.error(f"Error processing part: {part}, file id: {output_id}. Continuing with next part. Error: {e}")
+                    extraction_error = True
+                except JsonResponseError as e:
+                    if e.should_continue:
+                        extraction_error = True
+                    else:
+                        raise e
                 
         pbar.close()
     except Exception as e:
@@ -55,8 +69,8 @@ def process(base_directory):
         traceback.print_exc() # <-- this prints it to stdout
         logger.error(traceback.format_exc()) 
 
-        print(f"Error processing: {e}")
-        logger.error(f"Error processing: {e}")
+        print(f"Error processing - finishing execution: {e}")
+        logger.error(f"Error processing - finishing execution: {e}")
 
 
     print("Done!")

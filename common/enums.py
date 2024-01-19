@@ -35,3 +35,11 @@ class GeometryFormat(Enum):
 class CoordinateReference(Enum):
     WGS84_4326 = "EPSG:4326"
     WEB_MERCATOR_3857  = "EPSG:3857"
+
+class JsonErrorActionType(Enum):
+    SKIP = "skip"
+    STOP = "stop"
+
+class OutputTransformationType(Enum):
+    CAST="cast"
+    TRUNCATE="truncate"

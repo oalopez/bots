@@ -1,4 +1,4 @@
-from common.enums import OutputType
+from common.enums import OutputType, OutputTransformationType
 from common.utils.exceptions import InvalidTypeException
 from common.utils.profiling import lap_time
 import pandas as pd
@@ -29,17 +29,31 @@ def dataframe_type_transformations(df, output_json):
         if 'transformation' in field:
             transformation = field['transformation']
             if 'type' in transformation:
-                if transformation['type'] == 'int':
-                    df[field['field-name']] = df[field['field-name']].astype(int)
-                elif transformation['type'] == 'float':
-                    df[field['field-name']] = df[field['field-name']].astype(float)
-                elif transformation['type'] == 'string':
-                    df[field['field-name']] = df[field['field-name']].astype(str)
-                elif transformation['type'] == 'date':
-                    df[field['field-name']] = pd.to_datetime(df[field['field-name']], format=transformation['format'])
-                elif transformation['type'] == 'boolean':
-                    df[field['field-name']] = df[field['field-name']].astype(bool)
-                else:
-                    raise InvalidTypeException("Transformation type: " + transformation['type'] + " is not supported")
+                transformation_type = transformation['type']
+                field_name = field['field-name']
+                if transformation_type == OutputTransformationType.CAST.value:
+                    to = transformation['rules']['to']
+                    if to == 'int':
+                        df[field_name] = df[field_name].astype(int)
+                    elif to == 'float':
+                        df[field_name] = df[field_name].astype(float)
+                    elif to == 'string':
+                        df[field_name] = df[field_name].astype(str)
+                    elif to == 'date':
+                        df[field_name] = pd.to_datetime(df[field_name], format=transformation['format'])
+                    elif to == 'boolean':
+                        df[field_name] = df[field_name].astype(bool)
+                    else:
+                        raise InvalidTypeException("Transformation type: " + transformation_type + "(" + to + ") is not supported")
+                
+                elif transformation_type == OutputTransformationType.TRUNCATE.value:
+                    size = transformation['rules']['size']
+                    side = transformation['rules']['side']
+                    if side == 'left':
+                        df[field_name] = df[field_name].str[:size]
+                    elif side == 'right':
+                        df[field_name] = df[field_name].str[-size:]
+                    else:
+                        raise InvalidTypeException("Transformation type: " + transformation_type + "(" + side + ") is not supported")
             else:
                 raise InvalidTypeException("Transformation type is not defined")
