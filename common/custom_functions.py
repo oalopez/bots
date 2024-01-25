@@ -1,5 +1,8 @@
 import datetime
 import random
+import jsonpath_ng as jp
+
+from common.interpreter.input_interpreter import input as input_func
 
 def cons(value):
     return value
@@ -15,11 +18,16 @@ def slice_string(s, start=None, end=None):
     # if start is a string convert to int
     if isinstance(start, str):
         start = int(start)
+    # if is instance of int do nothing
+    elif isinstance(start, int):
+        pass
     else:
         raise Exception("start param must be a string: [" + str(start) + "] is not a string" )
     # if end is a string convert to int
     if isinstance(end, str):
         end = int(end)
+    elif isinstance(end, int):
+        pass
     else:
         raise Exception("end param must be a string: [" + str(end) + "] is not a string" )
     
@@ -46,3 +54,14 @@ def randint(start, end):
 
 def remove_decimals(value):
     return int(value)
+
+def input(value):
+    return input_func(value)
+
+def jsonpath(value, json_data):
+    jsonpath_expression = jp.parse(value)
+    matches = jsonpath_expression.find(json_data)
+    if matches:
+        return matches[0].value
+    else:
+        raise ValueError(f"Jsonpath query '{value}' did not match any data")

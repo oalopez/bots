@@ -2,6 +2,7 @@ from enum import Enum
 
 class ExtractionType(Enum):
     JSON_ALL_RECORDS = "json-all-records"
+    INPUT_JSON_X_PAGE = "input-json-per-page"
 
 class TransformationType(Enum):
     SIMPLE = "simple"
@@ -18,6 +19,7 @@ class PaginationType(Enum):
 
 class TotalRecordsType(Enum):
     JSON = "json"
+    TOTAL_INPUT = "total-input"
 
 class StopSequenceType(Enum):
     PAGE_LIMIT = "page-limit"
@@ -43,3 +45,6 @@ class JsonErrorActionType(Enum):
 class OutputTransformationType(Enum):
     CAST="cast"
     TRUNCATE="truncate"
+
+class InputType(Enum):
+    CSV="csv"

@@ -21,11 +21,11 @@
                 "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/sipra-nal/exclusiones"]
             },
             {
-                "name": "Python: Debug Mercado Tierras",
+                "name": "Python: Debug uniquekeys",
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/sipra-nal/mercado_tierras"]
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/sipra-nal/unique_keys"]
             },
             {
                 "name": "reduce_wkt_precision",

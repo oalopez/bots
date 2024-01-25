@@ -3,8 +3,6 @@ import pandas as pd
 import logging
 
 from transformer.type.simple import simple
-from transformer.type.regex import regex
-from transformer.type.json_source import json_source
 from transformer.type.cache import cache
 from transformer.type.geometry import geometry
 from shapely.geometry import Polygon
@@ -41,7 +39,8 @@ def transform(extracted_json_output, parsed_transformer, transformer_caches, pba
             df.loc[index, field_name] = transformed_value
             #context_vars['local_vars'][field_name] = transformed_value
         
-        pbar.update(1)
+        if pbar:
+            pbar.update(1)
 
     try: 
         save_partial_results(df)

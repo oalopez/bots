@@ -2,7 +2,7 @@ import os
 from common.global_state import GlobalStateKeys, global_state
 from common.interpreter.formula_executor import execute_node
 
-def generate_output(df, config_json, output_id=None, cache=None):
+def generate_output(df, config_json, output_id=None):
     rules = config_json['output']['rules']
     
     if not output_id:

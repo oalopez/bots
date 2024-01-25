@@ -5,7 +5,7 @@ import pandas as pd
 
 
 @lap_time(tolerance=2)
-def output(transformed_df, output_json, output_id=None, caches=None):
+def output(transformed_df, output_json, output_id=None):
 
     output_type = output_json['output']['type']
 
@@ -13,7 +13,7 @@ def output(transformed_df, output_json, output_id=None, caches=None):
     
     if output_type == OutputType.CSV.value:
         from output.type.csv import generate_output
-        return generate_output(transformed_df, output_json, output_id, caches)
+        return generate_output(transformed_df, output_json, output_id)
     else:
         raise InvalidTypeException("Output type: " + output_type + " is not supported")
     
