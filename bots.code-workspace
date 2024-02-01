@@ -8,17 +8,23 @@
         },
         {
             "path": "../../ext-data/upra-nacional/output-new-bot"
+        },
+        {
+            "path": "../../../../Users/oalopez/scripts/upra_files"
+        },
+        {
+            "path": "../../ext-data/output-bot-v1.0"
         }
     ],
     "launch": {
         "version": "0.2.0",
         "configurations": [
             {
-                "name": "Python: Debug Exclusiones",
+                "name": "Python: Debug Superfinanciera",
                 "type": "python",
                 "request": "launch",
                 "program": "/Volumes/External/ext-vscode-workspaces/bots/bot.py",
-                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/sipra-nal/exclusiones"]
+                "args": ["/Volumes/External/ext-vscode-workspaces/bots-config/exp-co/superfinanciera"]
             },
             {
                 "name": "Python: Debug uniquekeys",

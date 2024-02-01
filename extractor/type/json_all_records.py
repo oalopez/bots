@@ -4,6 +4,7 @@ import logging
 import json
 from common.enums import PaginationType, StopSequenceType, JsonErrorActionType
 from common.utils.exceptions import InvalidTypeException, JsonResponseError
+from common.interpreter.formula_executor import execute_node
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,13 @@ def extract(rules, part=0):
     params = rules['params']
     error_jsonpath = rules['error-response-jsonpath'] if 'error-response-jsonpath' in rules else None
     error_action = rules['error-action'] if 'error-action' in rules else None
+
+    # for every param, execute the node
+    calculated_params = {}
+    for param in params:
+        calculated_params[param] = execute_node(node_json=params[param])
+
+    source = execute_node(node_json=source)
 
     # 2. Read $.pagination.* from json object if exists
     pagination = rules['pagination'] if 'pagination' in rules else None
@@ -43,43 +51,47 @@ def extract(rules, part=0):
             pagination_params[pagination['next']['offset-param-name']] = step_size * part + offset_start
             pagination_params[pagination['next']['step-param-name']] = step_size
             # Update params with pagination params
-            params.update(pagination_params)
+            calculated_params.update(pagination_params)
         else:
             raise InvalidTypeException("Pagination type: " + pagination_type + " is not supported")
 
     try:
+
+        req_signature = f"Part: {part}, url: {source}, method: {method}, params: {calculated_params}"
+
         # 4. Go to URL and get json object
         if method.lower() == "get":
-            response = requests.get(source, params=params)
+            response = requests.get(source, params=calculated_params)
         elif method.lower() == "post":
-            response = requests.post(source, data=params)
+            response = requests.post(source, data=calculated_params)
         else:
             raise ValueError("Invalid method: " + method)
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error requesting URL: {source}, method: {method}, params: {params}. Error: {e}")
+        logger.error(f"Error requesting URL: {req_signature}. Error: {e}")
         raise e
 
     # 5. Check if response status code is 200
     try:
-        logger.info(f"Extracting part: {part}, url: {source}, method: {method}, params: {params}")
+        logger.info(f"Extracting... {req_signature}")
         json_all_records.append(response.json())
 
         # 5.1 Check if error jsonpath is not empty. If so, raise exception
-        error_value = jp.parse(error_jsonpath).find(response.json())
-        if len(error_value) > 0:
-            if error_action == JsonErrorActionType.SKIP.value:
-                logger.warning(f"Error given by the server : {part}, url: {source}, method: {method}, params: {params}. Error: {error_value}")
-                raise JsonResponseError(f"Error given by the server : {part}, url: {source}, method: {method}, params: {params}. Error: {error_value}", 
-                                        should_continue=True)
-            elif error_action == JsonErrorActionType.STOP.value:
-                logger.error(f"Error given by the server : {part}, url: {source}, method: {method}, params: {params}. Error: {error_value}")
-                raise JsonResponseError(f"Error given by the server : {part}, url: {source}, method: {method}, params: {params}. Error: {error_value}", 
-                                        should_continue=False)
-            else:
-                raise InvalidTypeException("Json Error action: " + error_action + " is not supported")
+        if error_jsonpath:
+            error_value = jp.parse(error_jsonpath).find(response.json())
+            if error_value is not None and len(error_value) > 0:
+                if error_action == JsonErrorActionType.SKIP.value:
+                    logger.warning(f"Error given by the server : {req_signature}. Error: {error_value}")
+                    raise JsonResponseError(f"Error given by the server : {req_signature}. Error: {error_value}", 
+                                            should_continue=True)
+                elif error_action == JsonErrorActionType.STOP.value:
+                    logger.error(f"Error given by the server : {req_signature}. Error: {error_value}")
+                    raise JsonResponseError(f"Error given by the server : {req_signature}. Error: {error_value}", 
+                                            should_continue=False)
+                else:
+                    raise InvalidTypeException("Json Error action: " + error_action + " is not supported")
 
     except json.decoder.JSONDecodeError as e:
-        logger.error(f"Error decoding json response. Part: {part}, url: {source}, method: {method}, params: {params}. Error: {e}")
+        logger.error(f"Error decoding json response. {req_signature}. Error: {e}")
         raise e
     
     # 6. Check if pagination is not null and stop-sequence is NO_MORE_RECORDS. If so, check if jsonpath is empty. If so, return empty list.

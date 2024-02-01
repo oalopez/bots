@@ -1,8 +1,15 @@
+import os
+import re
 import datetime
 import random
 import jsonpath_ng as jp
+import configparser
 
 from common.interpreter.input_interpreter import input as input_func
+from common.global_state import GlobalStateKeys, global_state
+
+config = configparser.ConfigParser()
+config.read('path/to/yourfile.properties')
 
 def cons(value):
     return value
@@ -65,3 +72,23 @@ def jsonpath(value, json_data):
         return matches[0].value
     else:
         raise ValueError(f"Jsonpath query '{value}' did not match any data")
+    
+
+base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
+properties_file_name = 'bot.properties'
+properties_file_path = os.path.join(base_directory, properties_file_name)
+
+def prop(section, prop_name):
+    if not hasattr(prop, "config"):
+        prop.config = configparser.ConfigParser()
+        try:
+            prop.config.read(properties_file_path)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Properties file '{properties_file_path}' not found")
+    
+    return prop.config[section].get(prop_name, None)
+
+
+def regex_sub(pattern, replacement, element):
+    result = re.sub(pattern, replacement, element)
+    return result

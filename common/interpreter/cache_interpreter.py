@@ -1,5 +1,7 @@
 import csv
 import os
+import json
+import jsonpath_ng as jp
 
 from common.utils.exceptions import InvalidTypeException
 from common.enums import CacheSourceType
@@ -43,10 +45,10 @@ def load_caches(json_data):
 
 def load_cache(cache_name, cache_definition):
     cache_type = cache_definition['type']
+    cache = None
     # Check if the cache exists, if not create it
     if cache_type == CacheSourceType.JSON.value: 
-        #TODO: Implement json cache loading from url
-        pass
+        cache = load_json_cache(cache_definition['rules'])
     elif cache_type == CacheSourceType.CSV.value:
         # Initialize the cache
         cache = load_csv_cache(cache_definition['rules'])
@@ -85,4 +87,43 @@ def load_csv_cache(cache_rules):
                 if cache_key not in cache:
                     cache[cache_key] = value
 
+    return cache
+
+def load_json_cache(cache_rules):
+    jsonpath_keys = cache_rules['jsonpath-keys']
+    jsonpath_value = cache_rules['jsonpath-value']
+    source = cache_rules['source']
+
+    if source.startswith('http'):
+        #json_data = load_json_url(source)
+        pass #TODO: Implement json cache loading from url
+    else:
+        if source.startswith('/'):
+            filepath = source
+        else:
+            base_directory = global_state.get_value(GlobalStateKeys.CURRENT_BASE_DIR)
+            filepath = os.path.join(base_directory, source)
+        
+        with open(filepath) as json_file:
+            data = json.load(json_file)
+            cache = {}
+            for row in data:
+                cache_key = 'PK'
+                for jp_key in jsonpath_keys:
+                    jsonpath_expression = jp.parse(jp_key)
+                    matches = jsonpath_expression.find(row)
+                    if matches:
+                        key_value = matches[0].value
+                        cache_key = cache_key + "_" + key_value
+                    else:
+                        raise ValueError(f"Jsonpath query for cache '{jp_key}' did not match any data")
+                jsonpath_expression = jp.parse(jsonpath_value)
+                matches = jsonpath_expression.find(row)
+                if matches:
+                    value = matches[0].value
+                else:
+                    raise ValueError(f"Jsonpath query for cache '{jsonpath_value}' did not match any data")
+
+                if cache_key not in cache:
+                    cache[cache_key] = value
     return cache
